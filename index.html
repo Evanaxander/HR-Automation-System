@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HR Forge — Workforce Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Epilogue:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --orange:     #F4600C;
+  --orange-lt:  #FFF0E8;
+  --orange-mid: #FFDCCA;
+  --white:      #FFFFFF;
+  --off:        #FAFAF9;
+  --gray-1:     #F5F4F2;
+  --gray-2:     #E8E6E2;
+  --gray-3:     #B8B3AB;
+  --gray-4:     #6B6560;
+  --ink:        #1A1714;
+  --green:      #1A7F4B;
+  --green-lt:   #E8F5EE;
+  --red:        #C0392B;
+  --red-lt:     #FDECEA;
+  --radius:     10px;
+  --shadow:     0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+}
+html, body { height: 100%; background: var(--off); color: var(--ink); font-family: 'Epilogue', sans-serif; }
+
+/* ── Layout ─────────────────────────────────────────────────── */
+.shell { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Sidebar ────────────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--gray-2);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+.brand {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--gray-2);
+}
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-dot {
+  width: 28px; height: 28px;
+  background: var(--orange);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.brand-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+}
+.brand-sub {
+  margin-top: 6px;
+  font-size: 0.68rem;
+  color: var(--gray-3);
+  font-family: 'Fira Code', monospace;
+  letter-spacing: 0.04em;
+}
+
+nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.nav-section-label {
+  font-size: 0.6rem;
+  font-family: 'Fira Code', monospace;
+  color: var(--gray-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 14px 10px 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--gray-4);
+  font-family: 'Epilogue', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.13s;
+  margin-bottom: 1px;
+}
+.nav-item:hover { background: var(--gray-1); color: var(--ink); }
+.nav-item.active { background: var(--orange-lt); color: var(--orange); }
+.nav-item .ni { font-size: 0.95rem; width: 18px; text-align: center; }
+
+.sidebar-status {
+  padding: 14px 20px;
+  border-top: 1px solid var(--gray-2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--gray-3);
+  font-family: 'Fira Code', monospace;
+}
+.dot-live {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: blink 2.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* ── Main content ───────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-2);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.topbar-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gray-1);
+  border: 1px solid var(--gray-2);
+  border-radius: 8px;
+  padding: 7px 14px;
+}
+.search-field input {
+  border: none; background: none; outline: none;
+  font-family: 'Epilogue', sans-serif; font-size: 0.85rem;
+  color: var(--ink); width: 200px;
+}
+.search-field input::placeholder { color: var(--gray-3); }
+.search-icon { color: var(--gray-3); font-size: 0.85rem; }
+
+.scroll-area { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+/* ── Pages ──────────────────────────────────────────────────── */
+.page { display: none; animation: fadeIn 0.18s ease; width: 100%; max-width: 1220px; margin: 0 auto; }
+.page.active { display: block; }
+@keyframes fadeIn { from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
+
+/* ── Stats row ──────────────────────────────────────────────── */
+.stats-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 28px; }
+.stat {
+  background: var(--white);
+  border: 1px solid var(--gray-2);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  transition: box-shadow 0.15s;
+}
+.stat:hover { box-shadow: var(--shadow); }
+.stat-num {
+  font-family: 'Fraunces', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+.stat-num.orange { color: var(--orange); }
+.stat-lbl { font-size: 0.72rem; color: var(--gray-3); margin-top: 5px; font-family: 'Fira Code', monospace; }
+
+/* ── Section heading ────────────────────────────────────────── */
+.sec-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.sec-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1rem; }
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border-radius: 8px; border: none;
+  font-family: 'Epilogue', sans-serif; font-size: 0.85rem; font-weight: 500;
+  cursor: pointer; transition: all 0.13s; white-space: nowrap;
+}
+.btn-primary { background: var(--orange); color: #fff; }
+.btn-primary:hover { background: #D94F00; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(244,96,12,0.3); }
+.btn-ghost { background: var(--white); color: var(--ink); border: 1px solid var(--gray-2); }
+.btn-ghost:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-lt); }
+.btn-danger { background: var(--red-lt); color: var(--red); border: 1px solid #F5C6C2; }
+.btn-danger:hover { background: #F9D5D2; }
+.btn-green { background: var(--green-lt); color: var(--green); border: 1px solid #B8DEC8; }
+.btn-green:hover { background: #D4EDE0; }
+.btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+.btn-xs { padding: 3px 10px; font-size: 0.73rem; }
+
+/* ── Card ───────────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-2);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* ── Table ──────────────────────────────────────────────────── */
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl thead tr { background: var(--gray-1); border-bottom: 1px solid var(--gray-2); }
+.tbl th {
+  text-align: left; padding: 10px 16px;
+  font-size: 0.67rem; font-family: 'Fira Code', monospace;
+  color: var(--gray-3); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500;
+}
+.tbl td { padding: 13px 16px; border-top: 1px solid var(--gray-2); font-size: 0.875rem; vertical-align: middle; }
+.tbl tbody tr { transition: background 0.1s; }
+.tbl tbody tr:hover { background: var(--off); }
+
+/* ── Badges ─────────────────────────────────────────────────── */
+.badge {
+  display: inline-block; padding: 2px 9px; border-radius: 20px;
+  font-size: 0.67rem; font-family: 'Fira Code', monospace; font-weight: 500;
+}
+.b-orange  { background: var(--orange-lt); color: var(--orange); }
+.b-green   { background: var(--green-lt);  color: var(--green); }
+.b-red     { background: var(--red-lt);    color: var(--red); }
+.b-gray    { background: var(--gray-1);    color: var(--gray-4); }
+
+/* ── Empty state ────────────────────────────────────────────── */
+.empty {
+  text-align: center; padding: 56px 24px;
+  color: var(--gray-3); font-size: 0.875rem;
+}
+.empty-icon { font-size: 2rem; margin-bottom: 10px; }
+
+/* ── Modal ──────────────────────────────────────────────────── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(26,23,20,0.45); backdrop-filter: blur(3px);
+  z-index: 200; align-items: center; justify-content: center;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--white);
+  border-radius: 14px;
+  width: 520px; max-width: 95vw;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  animation: popIn 0.18s ease;
+}
+@keyframes popIn { from{transform:scale(0.96);opacity:0} to{transform:scale(1);opacity:1} }
+.modal-head {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--gray-2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.05rem; }
+.close-btn { background: var(--gray-1); border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 50%; font-size: 0.9rem; color: var(--gray-4); transition: all 0.12s; display:flex;align-items:center;justify-content:center; }
+.close-btn:hover { background: var(--gray-2); color: var(--ink); }
+.modal-body { padding: 20px 24px; }
+.modal-foot { padding: 14px 24px; border-top: 1px solid var(--gray-2); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* ── Form ───────────────────────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg.full { grid-column: 1/-1; }
+.fg label { font-size: 0.68rem; font-family: 'Fira Code', monospace; color: var(--gray-4); letter-spacing: 0.06em; text-transform: uppercase; }
+.fg input, .fg select, .fg textarea {
+  background: var(--gray-1); border: 1.5px solid var(--gray-2); border-radius: 7px;
+  padding: 9px 12px; color: var(--ink);
+  font-family: 'Epilogue', sans-serif; font-size: 0.875rem; outline: none;
+  transition: border-color 0.13s;
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--orange); background: var(--white); }
+.fg textarea { resize: vertical; min-height: 90px; }
+
+/* ── Profile drawer ─────────────────────────────────────────── */
+.drawer {
+  position: fixed; right: 0; top: 0; bottom: 0;
+  width: 380px; background: var(--white);
+  border-left: 1px solid var(--gray-2);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.08);
+  z-index: 100; overflow-y: auto;
+  display: none; animation: slideIn 0.2s ease;
+}
+.drawer.open { display: block; }
+@keyframes slideIn { from{transform:translateX(20px);opacity:0} to{transform:none;opacity:1} }
+.drawer-head {
+  padding: 20px 22px;
+  background: linear-gradient(135deg, var(--orange-lt), var(--white));
+  border-bottom: 1px solid var(--orange-mid);
+  position: relative;
+}
+.drawer-close { position: absolute; top: 16px; right: 16px; }
+.drawer-avatar {
+  width: 48px; height: 48px;
+  background: var(--orange);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: white; margin-bottom: 10px;
+}
+.drawer-name { font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.1rem; }
+.drawer-sub  { font-size: 0.82rem; color: var(--gray-4); margin-top: 3px; }
+.drawer-sec { padding: 16px 22px; border-bottom: 1px solid var(--gray-2); }
+.drawer-sec-title { font-size: 0.62rem; font-family: 'Fira Code', monospace; color: var(--gray-3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.info-pair { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.84rem; }
+.info-pair .k { color: var(--gray-3); }
+.info-pair .v { font-family: 'Fira Code', monospace; font-size: 0.78rem; color: var(--ink); }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--orange-lt); border: 1px solid var(--orange-mid);
+  color: var(--orange); padding: 3px 10px; border-radius: 20px;
+  font-size: 0.72rem; font-family: 'Fira Code', monospace;
+}
+.chip-x { background: none; border: none; cursor: pointer; color: var(--orange); font-size: 0.8rem; padding: 0; line-height: 1; }
+.chip-x:hover { color: var(--red); }
+.drawer-actions { padding: 14px 22px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── Group cards ────────────────────────────────────────────── */
+.group-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 14px; }
+.group-card {
+  background: var(--white); border: 1.5px solid var(--gray-2);
+  border-radius: var(--radius); padding: 18px 20px;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.group-card:hover { border-color: var(--orange); box-shadow: 0 2px 12px rgba(244,96,12,0.1); transform: translateY(-1px); }
+.group-card-left { display: flex; align-items: center; gap: 12px; }
+.group-icon { font-size: 1.5rem; }
+.group-name { font-weight: 600; font-size: 0.9rem; }
+.group-desc { font-size: 0.75rem; color: var(--gray-3); margin-top: 2px; }
+.group-count { text-align: right; }
+.group-count .n { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; color: var(--orange); line-height: 1; }
+.group-count .l { font-size: 0.65rem; color: var(--gray-3); font-family: 'Fira Code', monospace; }
+
+/* ── Audit rows ─────────────────────────────────────────────── */
+.audit-row { display: flex; align-items: flex-start; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--gray-2); }
+.audit-row:last-child { border-bottom: none; }
+.audit-time { font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--gray-3); white-space: nowrap; padding-top: 1px; min-width: 110px; }
+.audit-action { font-size: 0.82rem; font-weight: 600; }
+.audit-detail { font-size: 0.8rem; color: var(--gray-4); }
+
+.audit-summary {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.audit-summary .badge {
+  padding: 4px 10px;
+  font-size: 0.68rem;
+}
+
+.audit-table td {
+  vertical-align: top;
+}
+
+.audit-entity {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.audit-detail-muted {
+  color: var(--gray-4);
+  margin-top: 3px;
+  font-size: 0.82rem;
+}
+
+/* ── Weekly task board ─────────────────────────────────────── */
+.task-strip {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gray-2);
+  background: linear-gradient(180deg, var(--white), #fff7f2);
+}
+.task-week { font-size: 0.74rem; color: var(--gray-4); font-family: 'Fira Code', monospace; }
+.task-progress {
+  width: 220px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--gray-2);
+  overflow: hidden;
+}
+.task-progress > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--orange), #ff9f5e);
+}
+.task-item { padding: 12px 16px; border-top: 1px solid var(--gray-2); }
+.task-top { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.task-title { font-size: 0.9rem; font-weight: 600; }
+.task-title.done { text-decoration: line-through; color: var(--gray-3); }
+.task-sub { margin-top: 4px; font-size: 0.78rem; color: var(--gray-4); line-height: 1.6; }
+.task-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.task-empty { padding: 30px 16px; text-align: center; color: var(--gray-3); font-size: 0.85rem; }
+
+/* ── Letter area ────────────────────────────────────────────── */
+.letter-form { background: var(--white); border: 1px solid var(--gray-2); border-radius: var(--radius); padding: 24px; max-width: 580px; }
+.letter-preview {
+  background: var(--gray-1); border: 1px solid var(--gray-2);
+  border-radius: 8px; padding: 24px; margin-top: 16px;
+  font-family: 'Fira Code', monospace; font-size: 0.78rem; line-height: 1.8;
+  white-space: pre-wrap; max-height: 300px; overflow-y: auto;
+  color: var(--ink);
+}
+.letter-saved { background: var(--green-lt); border: 1px solid #B8DEC8; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: var(--green); margin-top: 10px; }
+
+/* ── Autocomplete results ───────────────────────────────────── */
+.ac-results { margin-top: 4px; border: 1px solid var(--gray-2); border-radius: 8px; overflow: hidden; background: var(--white); box-shadow: var(--shadow); }
+.ac-item { padding: 9px 14px; cursor: pointer; font-size: 0.85rem; transition: background 0.1s; border-bottom: 1px solid var(--gray-2); }
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover { background: var(--orange-lt); color: var(--orange); }
+.ac-sub { font-size: 0.72rem; color: var(--gray-3); margin-top: 2px; font-family: 'Fira Code', monospace; }
+
+/* ── Tabs ───────────────────────────────────────────────────── */
+.tab-row { display: flex; gap: 4px; margin-bottom: 18px; padding: 4px; background: var(--gray-1); border-radius: 8px; width: fit-content; }
+.tab { padding: 6px 16px; border: none; border-radius: 6px; background: transparent; color: var(--gray-4); font-family: 'Epilogue', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.13s; }
+.tab.active { background: var(--white); color: var(--orange); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* ── Toast ──────────────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--ink); color: white;
+  padding: 11px 18px; border-radius: 8px; font-size: 0.85rem;
+  opacity: 0; transform: translateY(8px);
+  transition: all 0.22s; pointer-events: none; z-index: 999;
+  border-left: 3px solid var(--orange);
+}
+#toast.show { opacity: 1; transform: none; }
+#toast.err  { border-left-color: var(--red); }
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<!-- ── Sidebar ──────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">
+      <div class="brand-dot"></div>
+      <span class="brand-name">HR Forge</span>
+    </div>
+    <div class="brand-sub">Workforce Hub</div>
+  </div>
+
+  <nav>
+    <div class="nav-section-label">Main</div>
+    <button class="nav-item active" onclick="go('dashboard',this)">
+      <span class="ni"></span> Dashboard
+    </button>
+    <button class="nav-item" onclick="go('employees',this)">
+      <span class="ni"></span> Employees
+    </button>
+    <button class="nav-item" onclick="go('management',this)">
+      <span class="ni"></span> Management
+    </button>
+    <button class="nav-item" onclick="go('groups',this)">
+      <span class="ni"></span> WhatsApp Groups
+    </button>
+
+    <div class="nav-section-label">Records</div>
+    <button class="nav-item" onclick="go('documents',this)">
+      <span class="ni"></span> Documents
+    </button>
+    <button class="nav-item" onclick="go('letters',this)">
+      <span class="ni"></span> Letters
+    </button>
+
+    <div class="nav-section-label">System</div>
+    <button class="nav-item" onclick="go('audit',this)">
+      <span class="ni"></span> Audit Log
+    </button>
+  </nav>
+
+  <div class="sidebar-status">
+    <div class="dot-live"></div>
+    server live
+  </div>
+</aside>
+
+<!-- ── Main ─────────────────────────────────────── -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title" id="pageTitle">Dashboard</div>
+    <div class="topbar-right">
+      <div class="search-field" id="searchWrap" style="display:none">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="searchInput" placeholder="Search by name or ID…" oninput="handleSearch()">
+      </div>
+      <button class="btn btn-primary" id="topAddBtn" style="display:none" onclick="topAddAction()">＋ Add Employee</button>
+    </div>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll-area">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-num orange" id="s-active">—</div>
+          <div class="stat-lbl">active employees</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="s-inactive">—</div>
+          <div class="stat-lbl">inactive</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num orange" id="s-groups">—</div>
+          <div class="stat-lbl">whatsapp groups</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="s-docs">—</div>
+          <div class="stat-lbl">documents stored</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="s-letters">—</div>
+          <div class="stat-lbl">letters generated</div>
+        </div>
+      </div>
+
+      <div class="sec-head"><div class="sec-title">Quick Actions</div></div>
+      <div class="card" style="padding:16px 18px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="quickGo('employees')">Manage Employees</button>
+        <button class="btn btn-ghost" onclick="quickGo('management')">Management Directory</button>
+        <button class="btn btn-ghost" onclick="quickGo('documents')">Documents</button>
+        <button class="btn btn-ghost" onclick="quickGo('audit')">Open Audit Log</button>
+      </div>
+
+      <div class="sec-head" style="margin-top:18px">
+        <div class="sec-title">Weekly HR Tasks</div>
+        <button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ Add Task</button>
+      </div>
+      <div class="card" id="taskBoard">
+        <div class="task-empty">No tasks yet for this week.</div>
+      </div>
+    </div>
+
+    <!-- ── EMPLOYEES ── -->
+    <div class="page" id="page-employees">
+      <div class="sec-head" style="margin-bottom:14px">
+        <div class="tab-row">
+          <button class="tab active" onclick="filterEmp('active',this)">Active</button>
+          <button class="tab" onclick="filterEmp('inactive',this)">Inactive</button>
+        </div>
+      </div>
+      <div class="card" id="empTable">
+        <div class="empty"><div class="empty-icon"></div>No employees found</div>
+      </div>
+    </div>
+
+    <!-- ── GROUPS ── -->
+    <div class="page" id="page-groups">
+      <div class="sec-head">
+        <div class="sec-title">WhatsApp Groups</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-green" onclick="openWA()"> Open WhatsApp Web</button>
+          <button class="btn btn-primary" onclick="openModal('mAddGroup')"> New Group</button>
+        </div>
+      </div>
+      <div class="group-grid" id="groupGrid">
+        <div class="empty" style="grid-column:1/-1"><div class="empty-icon"></div>No groups yet</div>
+      </div>
+    </div>
+
+    <!-- ── MANAGEMENT ── -->
+    <div class="page" id="page-management">
+      <div class="sec-head">
+        <div class="sec-title">Leadership & Division Heads</div>
+        <button class="btn btn-primary" onclick="openModal('mAddMgmt')">+ Add Management</button>
+      </div>
+      <div class="card" style="padding:14px 16px;margin-bottom:14px;font-size:0.86rem;color:var(--gray-4)">
+        This section helps HR contact leadership quickly and review their team members with document visibility.
+      </div>
+      <div class="group-grid" id="mgmtGrid">
+        <div class="empty" style="grid-column:1/-1"><div class="empty-icon"></div>No management profiles found</div>
+      </div>
+    </div>
+
+    <!-- ── DOCUMENTS ── -->
+    <div class="page" id="page-documents">
+      <div class="sec-head">
+        <div class="sec-title">Employee Documents</div>
+      </div>
+      <div class="card" style="padding:20px;max-width:760px;margin-bottom:18px">
+        <div class="form-grid">
+          <div class="fg">
+            <label>Select Employee</label>
+            <select id="docEmpSel" onchange="loadEmpDocs()">
+              <option value="">— choose an employee —</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Document Type</label>
+            <select id="docTypeSel"></select>
+          </div>
+          <div class="fg full">
+            <label>Choose File</label>
+            <input id="docFile" type="file">
+          </div>
+          <div class="fg full">
+            <label>Notes (optional)</label>
+            <input id="docNotes" placeholder="Any notes about this file">
+          </div>
+          <div class="fg full" style="display:flex;align-items:flex-end">
+            <button class="btn btn-primary" onclick="uploadDoc()">Upload Document</button>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="docTable">
+        <div class="empty"><div class="empty-icon"></div>Select an employee above</div>
+      </div>
+
+      <div class="sec-head" style="margin-top:18px">
+        <div class="sec-title">Document Compliance</div>
+        <div id="docMissingSummary" class="badge b-red">Checking...</div>
+      </div>
+      <div class="card" id="docMissingTable">
+        <div class="empty"><div class="empty-icon"></div>Loading employee document status...</div>
+      </div>
+    </div>
+
+    <!-- ── LETTERS ── -->
+    <div class="page" id="page-letters">
+      <div class="sec-head"><div class="sec-title">Generate a Letter</div></div>
+      <div class="letter-form">
+        <div class="fg" style="margin-bottom:14px">
+          <label>Employee</label>
+          <input type="text" id="ltEmpQ" placeholder="Type name or ID…" oninput="acEmp()" autocomplete="off">
+          <div id="ltEmpAc"></div>
+        </div>
+        <div class="fg" style="margin-bottom:20px">
+          <label>Letter Type</label>
+          <select id="ltType"></select>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="generateLetter()">Generate &amp; Save Letter</button>
+        <div id="ltOut"></div>
+      </div>
+    </div>
+
+    <!-- ── AUDIT ── -->
+    <div class="page" id="page-audit">
+      <div class="sec-head">
+        <div class="sec-title">Audit Log</div>
+        <button class="btn btn-ghost" onclick="loadAudit()">↻ Refresh</button>
+      </div>
+      <div class="card" style="padding:12px 16px;margin-bottom:10px;font-size:0.83rem;color:var(--gray-4)">
+        Activity history from employee, management, documents, letters and group operations.
+      </div>
+      <div class="card" id="auditWrap">
+        <div class="empty"><div class="empty-icon"></div>No entries yet</div>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ── Profile Drawer ─────────────────────────── -->
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <button class="btn btn-ghost btn-xs drawer-close close-btn" onclick="closeDrawer()">✕</button>
+    <div class="drawer-avatar">👤</div>
+    <div class="drawer-name" id="dr-name">—</div>
+    <div class="drawer-sub"  id="dr-sub">—</div>
+    <div style="margin-top:8px;display:flex;gap:6px">
+      <span class="badge b-orange" id="dr-id">—</span>
+      <span class="badge" id="dr-status">—</span>
+    </div>
+  </div>
+
+  <div class="drawer-sec">
+    <div class="drawer-sec-title">Contact</div>
+    <div class="info-pair"><span class="k">Email</span><span class="v" id="dr-email">—</span></div>
+    <div class="info-pair"><span class="k">Phone</span><span class="v" id="dr-phone">—</span></div>
+    <div class="info-pair"><span class="k">WhatsApp</span><span class="v" id="dr-wa">—</span></div>
+    <div class="info-pair"><span class="k">Joined</span><span class="v" id="dr-join">—</span></div>
+  </div>
+
+  <div class="drawer-sec">
+    <div class="drawer-sec-title">WhatsApp Groups</div>
+    <div id="dr-groups"><span style="color:var(--gray-3);font-size:0.82rem">None</span></div>
+    <div style="margin-top:10px;display:flex;gap:6px">
+      <button class="btn btn-ghost btn-sm" onclick="openAddToGroup()"> Add to Group</button>
+      <button class="btn btn-danger btn-sm" onclick="removeFromAllGroups()"> Remove All</button>
+      <button class="btn btn-green btn-sm" onclick="openWA()"> WA Web</button>
+    </div>
+  </div>
+
+  <div class="drawer-sec">
+    <div class="drawer-sec-title">Documents</div>
+    <div id="dr-docs"><span style="color:var(--gray-3);font-size:0.82rem">None</span></div>
+    <div style="margin-top:10px;display:flex;gap:6px">
+      <button class="btn btn-primary btn-sm" onclick="openQuickDocModal()"> Add Document</button>
+    </div>
+  </div>
+
+  <div class="drawer-sec">
+    <div class="drawer-sec-title">Letters</div>
+    <div id="dr-letters"><span style="color:var(--gray-3);font-size:0.82rem">None</span></div>
+  </div>
+
+  <div class="drawer-actions">
+    <button class="btn btn-ghost btn-sm" onclick="openEditDrawer()"> Edit</button>
+    <button class="btn btn-danger btn-sm" onclick="deactivateCurrent()"> Deactivate</button>
+  </div>
+</div>
+
+<!-- ── Modals ─────────────────────────────────── -->
+
+<!-- Add Employee -->
+<div class="overlay" id="mAddEmp">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Add New Employee</div>
+      <button class="close-btn" onclick="closeModal('mAddEmp')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="fg"><label>Full Name *</label><input id="f-name" placeholder="Rafiq Hossain"></div>
+        <div class="fg"><label>Employee ID *</label><input id="f-id" placeholder="HR-001"></div>
+        <div class="fg"><label>Department</label><input id="f-dept" placeholder="Engineering"></div>
+        <div class="fg"><label>Role</label><input id="f-role" placeholder="Software Engineer"></div>
+        <div class="fg"><label>Email</label><input id="f-email" type="email" placeholder="rafiq@company.com"></div>
+        <div class="fg"><label>Phone</label><input id="f-phone" placeholder="+880 1X..."></div>
+        <div class="fg"><label>WhatsApp (with country code)</label><input id="f-wa" placeholder="+8801XXXXXXXXX"></div>
+        <div class="fg"><label>Join Date</label><input id="f-join" type="date"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('mAddEmp')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAddEmp()">Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Management -->
+<div class="overlay" id="mAddMgmt">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Add Management Profile</div>
+      <button class="close-btn" onclick="closeModal('mAddMgmt')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="fg"><label>Full Name *</label><input id="m-name" placeholder="Mehdi Hasan Monna"></div>
+        <div class="fg"><label>Employee ID *</label><input id="m-id" placeholder="MGT-001"></div>
+        <div class="fg"><label>Division *</label>
+          <select id="m-dept">
+            <option value="Operations">Operations</option>
+            <option value="Sales & Marketing">Sales & Marketing</option>
+            <option value="Cloud">Cloud</option>
+            <option value="Web Development">Web Development</option>
+            <option value="Microsoft">Microsoft</option>
+            <option value="Finance">Finance</option>
+            <option value="HR">HR</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="fg"><label>Designation *</label>
+          <select id="m-role" onchange="toggleCustomMgmtRole()">
+            <option value="CEO">CEO</option>
+            <option value="General Manager">General Manager</option>
+            <option value="Assistant General Manager">Assistant General Manager</option>
+            <option value="CTO">CTO</option>
+            <option value="COO">COO</option>
+            <option value="Team Leader">Team Leader</option>
+            <option value="Manager">Manager</option>
+            <option value="Director">Director</option>
+            <option value="__custom__">Other (type manually)</option>
+          </select>
+        </div>
+        <div class="fg full" id="m-role-custom-wrap" style="display:none">
+          <label>Custom Designation *</label>
+          <input id="m-role-custom" placeholder="Head of Product">
+        </div>
+        <div class="fg"><label>Email</label><input id="m-email" type="email" placeholder="leader@company.com"></div>
+        <div class="fg"><label>Phone</label><input id="m-phone" placeholder="+880 1X..."></div>
+        <div class="fg"><label>WhatsApp (with country code)</label><input id="m-wa" placeholder="+8801XXXXXXXXX"></div>
+        <div class="fg"><label>Join Date</label><input id="m-join" type="date"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('mAddMgmt')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAddMgmt()">Save Management</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Employee -->
+<div class="overlay" id="mEditEmp">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Edit Employee</div>
+      <button class="close-btn" onclick="closeModal('mEditEmp')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="fg full"><label>Full Name</label><input id="e-name"></div>
+        <div class="fg"><label>Department</label><input id="e-dept"></div>
+        <div class="fg"><label>Role</label><input id="e-role"></div>
+        <div class="fg"><label>Email</label><input id="e-email"></div>
+        <div class="fg"><label>Phone</label><input id="e-phone"></div>
+        <div class="fg"><label>WhatsApp</label><input id="e-wa"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('mEditEmp')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Add Document (from employee context) -->
+<div class="overlay" id="mAddDocQuick">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Add Document</div>
+      <button class="close-btn" onclick="closeModal('mAddDocQuick')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="fg full">
+          <label>Employee</label>
+          <input id="qd-emp" readonly>
+        </div>
+        <div class="fg full">
+          <label>Document Type</label>
+          <select id="qd-type"></select>
+        </div>
+        <div class="fg full">
+          <label>Choose File</label>
+          <input id="qd-file" type="file">
+        </div>
+        <div class="fg full">
+          <label>Notes (optional)</label>
+          <input id="qd-notes" placeholder="Any notes about this file">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('mAddDocQuick')">Cancel</button>
+      <button class="btn btn-primary" onclick="uploadDocForCurrent()">Upload</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Group -->
+<div class="overlay" id="mAddGroup">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Register WhatsApp Group</div>
+      <button class="close-btn" onclick="closeModal('mAddGroup')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg" style="margin-bottom:12px">
+        <label>Group Name * (exactly as it appears in WhatsApp)</label>
+        <input id="g-name" placeholder="Engineering Team 🛠️">
+      </div>
+      <div class="fg">
+        <label>Description (optional)</label>
+        <input id="g-desc" placeholder="Internal comms for the eng team">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('mAddGroup')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitGroup()">Save Group</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add to Group -->
+<div class="overlay" id="mAddToGroup">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Add to WhatsApp Group</div>
+      <button class="close-btn" onclick="closeModal('mAddToGroup')"></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.83rem;color:var(--gray-4);margin-bottom:16px;line-height:1.5">
+        This records the group membership in the system.<br>
+        You'll need to manually add them on WhatsApp Web.
+      </p>
+      <div class="fg">
+        <label>Select Group</label>
+        <select id="atgSel"></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('mAddToGroup')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAddToGroup()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Group Members -->
+<div class="overlay" id="mGroupMembers">
+  <div class="modal" style="width:580px">
+    <div class="modal-head">
+      <div class="modal-title" id="gmTitle">Members</div>
+      <button class="close-btn" onclick="closeModal('mGroupMembers')">✕</button>
+    </div>
+    <div class="modal-body" id="gmBody">
+      <div class="empty">No members</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-green" onclick="openWA()"> Open WhatsApp Web</button>
+      <button class="btn btn-ghost" onclick="closeModal('mGroupMembers')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Management Team Details -->
+<div class="overlay" id="mMgmtTeam">
+  <div class="modal" style="width:760px">
+    <div class="modal-head">
+      <div class="modal-title" id="mgmtTeamTitle">Team Details</div>
+      <button class="close-btn" onclick="closeModal('mMgmtTeam')">✕</button>
+    </div>
+    <div class="modal-body" id="mgmtTeamBody">
+      <div class="empty">Loading...</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('mMgmtTeam')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Missing Documents Info -->
+<div class="overlay" id="mMissingDocs">
+  <div class="modal" style="width:620px">
+    <div class="modal-head">
+      <div class="modal-title" id="mdTitle">Missing Documents</div>
+      <button class="close-btn" onclick="closeModal('mMissingDocs')">✕</button>
+    </div>
+    <div class="modal-body" id="mdBody">
+      <div class="empty">No missing documents</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('mMissingDocs')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Weekly Task Modal -->
+<div class="overlay" id="mTask">
+  <div class="modal" style="width:680px">
+    <div class="modal-head">
+      <div class="modal-title" id="taskModalTitle">Add Weekly Task</div>
+      <button class="close-btn" onclick="closeModal('mTask')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="fg full">
+          <label>Task Title *</label>
+          <input id="t-title" placeholder="Example: Collect monthly attendance report">
+        </div>
+        <div class="fg full">
+          <label>Task Details</label>
+          <textarea id="t-notes" placeholder="Context, reminder points, required files..."></textarea>
+        </div>
+        <div class="fg">
+          <label>Due Date</label>
+          <input id="t-due" type="date">
+        </div>
+        <div class="fg">
+          <label>Assign To Name</label>
+          <input id="t-assignee" placeholder="Mahin Rahman">
+        </div>
+        <div class="fg">
+          <label>Designation</label>
+          <input id="t-designation" placeholder="AGM, Operations">
+        </div>
+        <div class="fg">
+          <label>Email</label>
+          <input id="t-email" type="email" placeholder="person@company.com">
+        </div>
+        <div class="fg">
+          <label>Phone</label>
+          <input id="t-phone" placeholder="+8801XXXXXXXXX">
+        </div>
+        <div class="fg">
+          <label>WhatsApp</label>
+          <input id="t-wa" placeholder="+8801XXXXXXXXX">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('mTask')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = `${window.location.origin}/api`;
+let empFilter = 'active';
+let currentEmpId = null;
+let allGroups = [];
+let ltEmpId = null;
+let allDocTypes = [];
+let missingDocsByEmployee = {};
+let managementEmployees = [];
+const TASKS_STORAGE_KEY = 'hrforge.weeklyTasks';
+let weeklyTasks = [];
+let editingTaskId = null;
+
+const MANAGEMENT_KEYWORDS = [
+  'ceo', 'chief executive officer',
+  'gm', 'general manager',
+  'agm', 'assistant general manager',
+  'cto', 'chief technology officer',
+  'coo', 'chief operating officer',
+  'team lead', 'team leader', 'division head', 'head of',
+  'director', 'manager'
+];
+
+const ROLE_RANKS = [
+  'ceo', 'chief executive officer',
+  'gm', 'general manager',
+  'agm', 'assistant general manager',
+  'coo', 'chief operating officer',
+  'cto', 'chief technology officer',
+  'director', 'manager',
+  'team lead', 'team leader', 'lead'
+];
+
+// ── Helpers ───────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const docOpenUrl = docId => `${API}/documents/${docId}/open`;
+const toast = (msg, err=false) => {
+  const t = $('toast');
+  t.textContent = msg; t.className = 'show' + (err?' err':'');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.className='', 3000);
+};
+const openModal = id => $(id).classList.add('open');
+const closeModal = id => $(id).classList.remove('open');
+const json = (url, opts={}) => fetch(url, opts).then(r=>r.json()).catch(()=>null);
+
+function quickGo(page) {
+  const btn = [...document.querySelectorAll('.nav-item')]
+    .find(b => (b.getAttribute('onclick') || '').includes(`go('${page}'`));
+  if (btn) go(page, btn);
+}
+
+function getWeekLabel(d = new Date()) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diffToMonday = (day + 6) % 7;
+  const start = new Date(date);
+  start.setDate(date.getDate() - diffToMonday);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const opt = { month: 'short', day: 'numeric' };
+  return `${start.toLocaleDateString(undefined, opt)} - ${end.toLocaleDateString(undefined, opt)}`;
+}
+
+function loadTaskStorage() {
+  try {
+    const raw = localStorage.getItem(TASKS_STORAGE_KEY);
+    weeklyTasks = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(weeklyTasks)) weeklyTasks = [];
+  } catch {
+    weeklyTasks = [];
+  }
+}
+
+function saveTaskStorage() {
+  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(weeklyTasks));
+}
+
+function taskById(id) {
+  return weeklyTasks.find(t => t.id === id);
+}
+
+function renderTaskBoard() {
+  const el = $('taskBoard');
+  if (!el) return;
+
+  const total = weeklyTasks.length;
+  const done = weeklyTasks.filter(t => t.done).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  if (!total) {
+    el.innerHTML = `
+      <div class="task-strip">
+        <div>
+          <div class="sec-title" style="font-size:0.95rem">This Week: ${getWeekLabel()}</div>
+          <div class="task-week">0 of 0 completed</div>
+        </div>
+        <div class="task-progress"><span style="width:0%"></span></div>
+      </div>
+      <div class="task-empty">No tasks yet for this week. Add your first HR task.</div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="task-strip">
+      <div>
+        <div class="sec-title" style="font-size:0.95rem">This Week: ${getWeekLabel()}</div>
+        <div class="task-week">${done} of ${total} completed</div>
+      </div>
+      <div class="task-progress"><span style="width:${pct}%"></span></div>
+    </div>
+    ${weeklyTasks.map(t => `
+      <div class="task-item">
+        <div class="task-top">
+          <div>
+            <div class="task-title ${t.done ? 'done' : ''}">${t.title}</div>
+            <div class="task-sub">
+              ${t.notes ? `${t.notes}<br>` : ''}
+              ${t.assignee ? `<strong>Assignee:</strong> ${t.assignee}${t.designation ? ` (${t.designation})` : ''}<br>` : ''}
+              ${t.dueDate ? `<strong>Due:</strong> ${t.dueDate}<br>` : ''}
+              ${[t.email, t.phone || t.whatsapp].filter(Boolean).join(' · ') || 'No contact added'}
+            </div>
+          </div>
+          <span class="badge ${t.done ? 'b-green' : 'b-orange'}">${t.done ? 'Done' : 'Open'}</span>
+        </div>
+        <div class="task-actions" style="margin-top:10px">
+          <button class="btn btn-green btn-xs" onclick="toggleTaskDone('${t.id}')">${t.done ? 'Mark Open' : 'Mark Done'}</button>
+          <button class="btn btn-ghost btn-xs" onclick="openTaskModal('${t.id}')">Edit</button>
+          <button class="btn btn-ghost btn-xs" onclick="shareTask('${t.id}')">Share</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteTask('${t.id}')">Delete</button>
+        </div>
+      </div>
+    `).join('')}`;
+}
+
+function openTaskModal(taskId = null) {
+  editingTaskId = taskId;
+  const task = taskId ? taskById(taskId) : null;
+  $('taskModalTitle').textContent = task ? 'Edit Weekly Task' : 'Add Weekly Task';
+
+  $('t-title').value = task?.title || '';
+  $('t-notes').value = task?.notes || '';
+  $('t-due').value = task?.dueDate || '';
+  $('t-assignee').value = task?.assignee || '';
+  $('t-designation').value = task?.designation || '';
+  $('t-email').value = task?.email || '';
+  $('t-phone').value = task?.phone || '';
+  $('t-wa').value = task?.whatsapp || '';
+  openModal('mTask');
+}
+
+function saveTask() {
+  const payload = {
+    title: $('t-title').value.trim(),
+    notes: $('t-notes').value.trim(),
+    dueDate: $('t-due').value,
+    assignee: $('t-assignee').value.trim(),
+    designation: $('t-designation').value.trim(),
+    email: $('t-email').value.trim(),
+    phone: $('t-phone').value.trim(),
+    whatsapp: $('t-wa').value.trim(),
+  };
+
+  if (!payload.title) {
+    toast('Task title is required', true);
+    return;
+  }
+
+  if (editingTaskId) {
+    weeklyTasks = weeklyTasks.map(t => t.id === editingTaskId ? { ...t, ...payload } : t);
+    toast('Task updated');
+  } else {
+    weeklyTasks.unshift({ id: String(Date.now()), done: false, ...payload });
+    toast('Task added');
+  }
+
+  saveTaskStorage();
+  renderTaskBoard();
+  closeModal('mTask');
+}
+
+function toggleTaskDone(taskId) {
+  weeklyTasks = weeklyTasks.map(t => t.id === taskId ? { ...t, done: !t.done } : t);
+  saveTaskStorage();
+  renderTaskBoard();
+}
+
+function deleteTask(taskId) {
+  if (!confirm('Delete this task?')) return;
+  weeklyTasks = weeklyTasks.filter(t => t.id !== taskId);
+  saveTaskStorage();
+  renderTaskBoard();
+  toast('Task deleted');
+}
+
+function shareTask(taskId) {
+  const t = taskById(taskId);
+  if (!t) return;
+
+  const text = `Weekly HR Task: ${t.title}\n${t.notes || ''}\nAssignee: ${t.assignee || 'N/A'} ${t.designation ? '(' + t.designation + ')' : ''}\nDue: ${t.dueDate || 'N/A'}`;
+  if (t.email) {
+    const subject = encodeURIComponent(`Weekly HR Task: ${t.title}`);
+    const body = encodeURIComponent(text);
+    window.location.href = `mailto:${t.email}?subject=${subject}&body=${body}`;
+    return;
+  }
+
+  const digits = (t.whatsapp || t.phone || '').replace(/\D/g, '');
+  if (digits) {
+    const msg = encodeURIComponent(text);
+    window.open(`https://wa.me/${digits}?text=${msg}`, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  toast('No email or phone/WhatsApp found to share this task', true);
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function go(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  $('page-'+page).classList.add('active');
+  btn.classList.add('active');
+
+  const titles = {dashboard:'Dashboard', employees:'Employees', management:'Management',
+    groups:'WhatsApp Groups', documents:'Documents', letters:'Letters', audit:'Audit Log'};
+  $('pageTitle').textContent = titles[page];
+  $('searchWrap').style.display   = page==='employees' ? 'flex' : 'none';
+  $('topAddBtn').style.display    = page==='employees' ? 'inline-flex' : 'none';
+  closeDrawer();
+
+  const loaders = {dashboard:loadDashboard, employees:loadEmployees, management:loadManagement,
+    groups:loadGroups, documents:loadDocPage, letters:loadLetterPage, audit:loadAudit};
+  loaders[page]?.();
+}
+
+function topAddAction() { openModal('mAddEmp'); }
+
+function toggleCustomMgmtRole() {
+  const useCustom = $('m-role').value === '__custom__';
+  $('m-role-custom-wrap').style.display = useCustom ? 'block' : 'none';
+  if (!useCustom) $('m-role-custom').value = '';
+}
+
+async function submitAddMgmt() {
+  const roleRaw = $('m-role').value;
+  const role = roleRaw === '__custom__' ? $('m-role-custom').value.trim() : roleRaw;
+  const payload = {
+    full_name: $('m-name').value.trim(),
+    employee_id: $('m-id').value.trim(),
+    department: $('m-dept').value.trim(),
+    role: role,
+    email: $('m-email').value.trim(),
+    phone: $('m-phone').value.trim(),
+    whatsapp: $('m-wa').value.trim(),
+    join_date: $('m-join').value,
+  };
+
+  if (!payload.full_name || !payload.employee_id || !payload.department || !payload.role) {
+    toast('Name, ID, division and designation are required', true);
+    return;
+  }
+
+  const r = await json(`${API}/employees`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload),
+  });
+
+  if (r?.success) {
+    toast('Management profile added');
+    closeModal('mAddMgmt');
+    ['m-name','m-id','m-email','m-phone','m-wa','m-join','m-role-custom'].forEach(id => $(id).value = '');
+    $('m-dept').selectedIndex = 0;
+    $('m-role').selectedIndex = 0;
+    toggleCustomMgmtRole();
+    loadManagement();
+    loadEmployees();
+    loadDashboard();
+  } else {
+    toast(r?.error || 'Failed to add management profile', true);
+  }
+}
+
+// ── Dashboard ─────────────────────────────────────────────────
+async function loadDashboard() {
+  const s = await json(`${API}/stats`);
+  if (!s) { toast('Cannot reach server — is server.py running?', true); return; }
+  $('s-active').textContent   = s.active;
+  $('s-inactive').textContent = s.inactive;
+  $('s-groups').textContent   = s.groups;
+  $('s-docs').textContent     = s.docs;
+  $('s-letters').textContent  = s.letters;
+  renderTaskBoard();
+}
+
+// ── Employees ─────────────────────────────────────────────────
+async function loadEmployees(search='') {
+  const url = `${API}/employees?status=${empFilter}` + (search?`&search=${encodeURIComponent(search)}`:'');
+  const data = await json(url) || [];
+  const el = $('empTable');
+  if (!data.length) {
+    el.innerHTML='<div class="empty"><div class="empty-icon">👥</div>No employees found</div>'; return;
+  }
+  el.innerHTML = `
+    <table class="tbl">
+      <thead><tr><th>Name</th><th>ID</th><th>Department</th><th>Role</th><th>WhatsApp</th><th>Joined</th><th></th></tr></thead>
+      <tbody>${data.map(e=>`
+        <tr>
+          <td><strong>${e.full_name}</strong></td>
+          <td><span class="badge b-orange">${e.employee_id}</span></td>
+          <td>${e.department||'—'}</td>
+          <td>${e.role||'—'}</td>
+          <td style="font-family:'Fira Code',monospace;font-size:0.78rem">${e.whatsapp||'—'}</td>
+          <td style="color:var(--gray-3);font-size:0.8rem">${e.join_date||'—'}</td>
+          <td style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-xs" onclick="openProfile(${e.id})">View →</button>
+            <button class="btn btn-primary btn-xs" onclick="openQuickDocModal(${e.id})">+ Doc</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function filterEmp(status, btn) {
+  empFilter = status;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  loadEmployees();
+}
+function handleSearch() { loadEmployees($('searchInput').value); }
+
+// ── Profile drawer ────────────────────────────────────────────
+async function openProfile(id) {
+  currentEmpId = id;
+  const e = await json(`${API}/employees/${id}`);
+  if (!e) { toast('Could not load profile', true); return; }
+
+  $('dr-name').textContent    = e.full_name;
+  $('dr-sub').textContent     = [e.role, e.department].filter(Boolean).join(' · ');
+  $('dr-id').textContent      = e.employee_id;
+  $('dr-status').textContent  = e.status;
+  $('dr-status').className    = 'badge ' + (e.status==='active'?'b-green':'b-red');
+  $('dr-email').textContent   = e.email||'—';
+  $('dr-phone').textContent   = e.phone||'—';
+  $('dr-wa').textContent      = e.whatsapp||'—';
+  $('dr-join').textContent    = e.join_date||'—';
+
+  // Groups
+  const gEl = $('dr-groups');
+  if (e.groups?.length) {
+    gEl.innerHTML = '<div class="chip-row">' + e.groups.map(g =>
+      `<span class="chip">${g.group_name}
+        <button class="chip-x" onclick="removeFromGroup(${id},'${g.group_name}')">×</button>
+      </span>`).join('') + '</div>';
+  } else gEl.innerHTML = '<span style="color:var(--gray-3);font-size:0.82rem">Not in any groups</span>';
+
+  // Docs
+  const dEl = $('dr-docs');
+  if (e.docs?.length) {
+    dEl.innerHTML = e.docs.map(d=>`
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-2);font-size:0.82rem">
+        <span>
+          <span class="badge b-gray">${d.doc_type}</span>
+          &nbsp;<a href="${docOpenUrl(d.id)}" target="_blank" rel="noopener noreferrer">${d.filename}</a>
+        </span>
+        <span style="color:var(--gray-3);font-size:0.72rem">${d.uploaded_at.slice(0,10)}</span>
+      </div>`).join('');
+  } else dEl.innerHTML = '<span style="color:var(--gray-3);font-size:0.82rem">No documents uploaded</span>';
+
+  // Letters
+  const lEl = $('dr-letters');
+  if (e.letters?.length) {
+    lEl.innerHTML = e.letters.map(l=>`
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:0.82rem;border-bottom:1px solid var(--gray-2)">
+        <span>${l.letter_type}</span>
+        <span style="color:var(--gray-3);font-size:0.72rem">${l.created_at.slice(0,10)}</span>
+      </div>`).join('');
+  } else lEl.innerHTML = '<span style="color:var(--gray-3);font-size:0.82rem">No letters generated</span>';
+
+  $('drawer').classList.add('open');
+}
+
+function closeDrawer() { $('drawer').classList.remove('open'); currentEmpId=null; }
+
+function openEditDrawer() {
+  if (!currentEmpId) return;
+  const n=$('dr-name').textContent, s=$('dr-sub').textContent.split(' · ');
+  $('e-name').value  = n;
+  $('e-role').value  = s[0]||'';
+  $('e-dept').value  = s[1]||'';
+  $('e-email').value = $('dr-email').textContent.replace('—','');
+  $('e-phone').value = $('dr-phone').textContent.replace('—','');
+  $('e-wa').value    = $('dr-wa').textContent.replace('—','');
+  openModal('mEditEmp');
+}
+
+async function submitEdit() {
+  const body = {
+    full_name: $('e-name').value.trim(),
+    department: $('e-dept').value.trim(),
+    role: $('e-role').value.trim(),
+    email: $('e-email').value.trim(),
+    phone: $('e-phone').value.trim(),
+    whatsapp: $('e-wa').value.trim(),
+  };
+  const r = await json(`${API}/employees/${currentEmpId}`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if (r?.success) { toast(' Employee updated'); closeModal('mEditEmp'); openProfile(currentEmpId); loadEmployees(); }
+  else toast('Update failed', true);
+}
+
+async function deactivateCurrent() {
+  if (!currentEmpId || !confirm('Deactivate this employee?')) return;
+  const r = await json(`${API}/employees/${currentEmpId}/deactivate`, {method:'POST'});
+  if (r?.success) { toast('Employee deactivated'); closeDrawer(); loadEmployees(); loadDashboard(); }
+}
+
+async function openQuickDocModal(empId = null) {
+  if (empId) currentEmpId = empId;
+  if (!currentEmpId) { toast('Open an employee first', true); return; }
+
+  const [emp, types] = await Promise.all([
+    json(`${API}/employees/${currentEmpId}`),
+    json(`${API}/doc-types`),
+  ]);
+
+  if (!emp) { toast('Could not load employee', true); return; }
+  $('qd-emp').value = `${emp.full_name} [${emp.employee_id}]`;
+  $('qd-type').innerHTML = (types || []).map(t => `<option value="${t}">${t}</option>`).join('');
+  $('qd-file').value = '';
+  $('qd-notes').value = '';
+  openModal('mAddDocQuick');
+}
+
+async function uploadDocForCurrent() {
+  if (!currentEmpId) { toast('Open an employee first', true); return; }
+
+  const docType = $('qd-type').value;
+  const file = $('qd-file').files?.[0];
+  const notes = $('qd-notes').value.trim();
+
+  if (!docType) { toast('Select a document type', true); return; }
+  if (!file) { toast('Choose a file to upload', true); return; }
+
+  const form = new FormData();
+  form.append('doc_type', docType);
+  form.append('notes', notes);
+  form.append('file', file);
+
+  try {
+    const res = await fetch(`${API}/employees/${currentEmpId}/documents`, { method: 'POST', body: form });
+    const data = await res.json();
+    if (!res.ok || !data?.success) {
+      toast(data?.error || 'Upload failed', true);
+      return;
+    }
+
+    closeModal('mAddDocQuick');
+    toast('Document uploaded');
+    openProfile(currentEmpId);
+    loadDashboard();
+    loadDocPage();
+  } catch {
+    toast('Upload failed', true);
+  }
+}
+
+// ── Add Employee ──────────────────────────────────────────────
+async function submitAddEmp() {
+  const b = {
+    full_name:   $('f-name').value.trim(),
+    employee_id: $('f-id').value.trim(),
+    department:  $('f-dept').value.trim(),
+    role:        $('f-role').value.trim(),
+    email:       $('f-email').value.trim(),
+    phone:       $('f-phone').value.trim(),
+    whatsapp:    $('f-wa').value.trim(),
+    join_date:   $('f-join').value,
+  };
+  if (!b.full_name || !b.employee_id) { toast('Name and ID are required', true); return; }
+  const r = await json(`${API}/employees`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
+  if (r?.success) {
+    toast(' Employee added!');
+    closeModal('mAddEmp');
+    ['f-name','f-id','f-dept','f-role','f-email','f-phone','f-wa','f-join'].forEach(id=>$(id).value='');
+    loadEmployees(); loadDashboard();
+  } else toast(r?.error||'Failed', true);
+}
+
+// ── Groups ────────────────────────────────────────────────────
+async function loadGroups() {
+  allGroups = await json(`${API}/groups`) || [];
+  const el = $('groupGrid');
+  if (!allGroups.length) {
+    el.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon"></div>No groups registered yet</div>'; return;
+  }
+  el.innerHTML = allGroups.map(g=>`
+    <div class="group-card" onclick="viewGroupMembers(${g.id},'${g.group_name.replace(/'/g,"\\'")}')">
+      <div class="group-card-left">
+        <div class="group-icon"></div>
+        <div>
+          <div class="group-name">${g.group_name}</div>
+          <div class="group-desc">${g.description||'No description'}</div>
+        </div>
+      </div>
+      <div class="group-count">
+        <div class="n">${g.member_count}</div>
+        <div class="l">members</div>
+      </div>
+    </div>`).join('');
+}
+
+async function submitGroup() {
+  const name=$('g-name').value.trim(), desc=$('g-desc').value.trim();
+  if (!name) { toast('Group name required', true); return; }
+  const r = await json(`${API}/groups`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({group_name:name,description:desc})});
+  if (r?.success) { toast(' Group added!'); closeModal('mAddGroup'); $('g-name').value=''; $('g-desc').value=''; loadGroups(); }
+  else toast(r?.error||'Failed', true);
+}
+
+async function viewGroupMembers(gid, gname) {
+  const members = await json(`${API}/groups/${gid}/members`) || [];
+  $('gmTitle').textContent = `${gname}  (${members.length} members)`;
+  const el = $('gmBody');
+  if (!members.length) { el.innerHTML='<div class="empty">No members yet</div>'; openModal('mGroupMembers'); return; }
+  el.innerHTML = `
+    <table class="tbl">
+      <thead><tr><th>Name</th><th>ID</th><th>Role</th><th>WhatsApp</th><th>Added</th></tr></thead>
+      <tbody>${members.map(m=>`
+        <tr>
+          <td><strong>${m.full_name}</strong></td>
+          <td><span class="badge b-orange">${m.employee_id}</span></td>
+          <td>${m.role||'—'}</td>
+          <td style="font-family:'Fira Code',monospace;font-size:0.75rem">${m.whatsapp||'—'}</td>
+          <td style="color:var(--gray-3);font-size:0.75rem">${m.joined_at.slice(0,10)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  openModal('mGroupMembers');
+}
+
+async function openAddToGroup() {
+  if (!currentEmpId) return;
+  allGroups = await json(`${API}/groups`) || [];
+  $('atgSel').innerHTML = allGroups.map(g=>`<option value="${g.id}">${g.group_name}</option>`).join('');
+  openModal('mAddToGroup');
+}
+
+async function submitAddToGroup() {
+  const gid = parseInt($('atgSel').value);
+  const r = await json(`${API}/employees/${currentEmpId}/groups`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({group_id:gid})});
+  if (r?.success) { toast(' Added to group! Remember to add them on WhatsApp Web too.'); closeModal('mAddToGroup'); openProfile(currentEmpId); }
+  else toast(r?.error||'Already in this group', true);
+}
+
+async function removeFromGroup(empId, groupName) {
+  const g = allGroups.find(x=>x.group_name===groupName);
+  if (!g) { allGroups = await json(`${API}/groups`)||[]; return removeFromGroup(empId,groupName); }
+  if (!confirm(`Remove from "${groupName}"?`)) return;
+  const r = await json(`${API}/employees/${empId}/groups/${g.id}`, {method:'DELETE'});
+  if (r?.success) { toast('Removed from group'); openProfile(empId); }
+}
+
+async function removeFromAllGroups() {
+  if (!currentEmpId) return;
+  if (!confirm('Remove this employee from ALL WhatsApp groups?')) return;
+  const r = await json(`${API}/employees/${currentEmpId}/groups`, { method: 'DELETE' });
+  if (r?.success) {
+    toast(`Removed from ${r.removed || 0} group(s)`);
+    openProfile(currentEmpId);
+    loadGroups();
+  } else {
+    toast('Could not remove from all groups', true);
+  }
+}
+
+async function openWA() {
+  await json(`${API}/whatsapp/open`, {method:'POST'}).catch(()=>{});
+  toast('Opening WhatsApp Web in Chrome…');
+}
+
+function normalizeWhatsapp(raw) {
+  const digits = (raw || '').replace(/\D/g, '');
+  return digits || '';
+}
+
+function whatsappHref(raw) {
+  const digits = normalizeWhatsapp(raw);
+  return digits ? `https://wa.me/${digits}` : '';
+}
+
+function leadershipRank(role = '') {
+  const r = role.toLowerCase();
+  const idx = ROLE_RANKS.findIndex(k => r.includes(k));
+  return idx === -1 ? 999 : idx;
+}
+
+function isManagementRole(role = '') {
+  const r = role.toLowerCase();
+  return MANAGEMENT_KEYWORDS.some(k => r.includes(k));
+}
+
+function contactButtonsHtml(person) {
+  const wa = whatsappHref(person.whatsapp || person.phone);
+  const email = (person.email || '').trim();
+  return `
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${wa ? `<a class="btn btn-green btn-xs" target="_blank" rel="noopener noreferrer" href="${wa}">WhatsApp</a>` : `<button class="btn btn-green btn-xs" disabled>WhatsApp</button>`}
+      ${email ? `<a class="btn btn-ghost btn-xs" href="mailto:${email}">Email</a>` : `<button class="btn btn-ghost btn-xs" disabled>Email</button>`}
+    </div>`;
+}
+
+function getReportsForLeader(leader, everyone) {
+  const sameDivision = everyone.filter(e => e.id !== leader.id && (e.department || '') === (leader.department || ''));
+  if (sameDivision.length) return sameDivision;
+
+  const leaderTitle = (leader.role || '').toLowerCase();
+  const isTopExec = leaderTitle.includes('ceo') || leaderTitle.includes('general manager') || leaderTitle.includes('chief');
+  if (isTopExec) return everyone.filter(e => e.id !== leader.id);
+
+  return everyone.filter(e => e.id !== leader.id && !isManagementRole(e.role || ''));
+}
+
+async function loadManagement() {
+  const grid = $('mgmtGrid');
+  const emps = await json(`${API}/employees?status=active`) || [];
+  managementEmployees = emps;
+
+  const leaders = emps
+    .filter(e => isManagementRole(e.role || ''))
+    .sort((a, b) => leadershipRank(a.role) - leadershipRank(b.role) || a.full_name.localeCompare(b.full_name));
+
+  if (!leaders.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon"></div>No management profiles found. Add role names like CEO, GM, AGM, CTO, COO, Team Leader.</div>';
+    return;
+  }
+
+  grid.innerHTML = leaders.map(l => {
+    const reports = getReportsForLeader(l, emps);
+    return `
+      <div class="group-card" style="cursor:default;align-items:flex-start;gap:10px;flex-direction:column">
+        <div style="width:100%;display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+          <div>
+            <div class="group-name">${l.full_name}</div>
+            <div class="group-desc">${l.role || '—'} · ${l.department || 'No division set'}</div>
+          </div>
+          <span class="badge b-orange">${l.employee_id}</span>
+        </div>
+
+        <div style="font-size:0.8rem;color:var(--gray-4);line-height:1.7;width:100%">
+          <div><strong>Phone:</strong> ${l.phone || '—'}</div>
+          <div><strong>WhatsApp:</strong> ${l.whatsapp || '—'}</div>
+          <div><strong>Email:</strong> ${l.email || '—'}</div>
+          <div><strong>People Working Under:</strong> ${reports.length}</div>
+        </div>
+
+        <div style="display:flex;gap:6px;flex-wrap:wrap;width:100%">
+          ${contactButtonsHtml(l)}
+          <button class="btn btn-primary btn-xs" onclick="openMgmtTeam(${l.id})">Info</button>
+          <button class="btn btn-ghost btn-xs" onclick="openProfile(${l.id})">Profile</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function openMgmtTeam(leaderId) {
+  const leader = managementEmployees.find(e => e.id === leaderId);
+  if (!leader) { toast('Leader not found', true); return; }
+
+  const reports = getReportsForLeader(leader, managementEmployees);
+  $('mgmtTeamTitle').textContent = `${leader.full_name} · ${leader.role || 'Leader'} · ${reports.length} team member(s)`;
+
+  if (!reports.length) {
+    $('mgmtTeamBody').innerHTML = '<div class="empty"><div class="empty-icon"></div>No team members found under this role/division.</div>';
+    openModal('mMgmtTeam');
+    return;
+  }
+
+  const reportDetails = await Promise.all(
+    reports.map(async r => {
+      const detail = await json(`${API}/employees/${r.id}`);
+      return { ...r, docsCount: detail?.docs?.length || 0 };
+    })
+  );
+
+  $('mgmtTeamBody').innerHTML = `
+    <table class="tbl">
+      <thead><tr><th>Name</th><th>ID</th><th>Designation</th><th>Division</th><th>Docs</th><th>Contact</th></tr></thead>
+      <tbody>${reportDetails.map(r => `
+        <tr>
+          <td><strong>${r.full_name}</strong></td>
+          <td><span class="badge b-orange">${r.employee_id}</span></td>
+          <td>${r.role || '—'}</td>
+          <td>${r.department || '—'}</td>
+          <td><span class="badge ${r.docsCount ? 'b-green' : 'b-red'}">${r.docsCount}</span></td>
+          <td>${contactButtonsHtml(r)}</td>
+        </tr>
+      `).join('')}</tbody>
+    </table>`;
+  openModal('mMgmtTeam');
+}
+
+// ── Documents ─────────────────────────────────────────────────
+async function loadDocPage() {
+  const emps = await json(`${API}/employees?status=active`) || [];
+  const types = await json(`${API}/doc-types`) || [];
+  allDocTypes = types;
+  const sel = $('docEmpSel');
+  sel.innerHTML = '<option value="">— choose an employee —</option>' +
+    emps.map(e=>`<option value="${e.id}">${e.full_name}  [${e.employee_id}]</option>`).join('');
+
+  const tSel = $('docTypeSel');
+  tSel.innerHTML = types.length
+    ? types.map(t=>`<option value="${t}">${t}</option>`).join('')
+    : '<option value="">No document types</option>';
+
+  loadMissingDocsOverview(emps);
+}
+
+async function loadMissingDocsOverview(emps) {
+  const table = $('docMissingTable');
+  const summary = $('docMissingSummary');
+
+  if (!emps.length) {
+    summary.textContent = 'No active employees';
+    summary.className = 'badge b-gray';
+    table.innerHTML = '<div class="empty"><div class="empty-icon"></div>No active employees found</div>';
+    missingDocsByEmployee = {};
+    return;
+  }
+
+  const results = await Promise.all(
+    emps.map(async (e) => {
+      const docs = await json(`${API}/employees/${e.id}/documents`) || [];
+      const uploaded = new Set(docs.map(d => d.doc_type));
+      const missing = (allDocTypes || []).filter(t => !uploaded.has(t));
+      return {
+        id: e.id,
+        full_name: e.full_name,
+        employee_id: e.employee_id,
+        uploadedCount: uploaded.size,
+        missing,
+      };
+    })
+  );
+
+  missingDocsByEmployee = Object.fromEntries(results.map(r => [String(r.id), r]));
+
+  const withMissing = results.filter(r => r.missing.length > 0);
+  summary.textContent = `${withMissing.length} employee(s) missing documents`;
+  summary.className = withMissing.length ? 'badge b-red' : 'badge b-green';
+
+  table.innerHTML = `
+    <table class="tbl">
+      <thead><tr><th>Employee</th><th>ID</th><th>Uploaded Types</th><th>Missing</th><th></th></tr></thead>
+      <tbody>${results.map(r=>`
+        <tr>
+          <td><strong>${r.full_name}</strong></td>
+          <td><span class="badge b-orange">${r.employee_id}</span></td>
+          <td>${r.uploadedCount}</td>
+          <td><span class="badge ${r.missing.length ? 'b-red' : 'b-green'}">${r.missing.length}</span></td>
+          <td>
+            <button class="btn btn-ghost btn-xs" onclick="showMissingDocsInfo(${r.id})">Info</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function showMissingDocsInfo(empId) {
+  const info = missingDocsByEmployee[String(empId)];
+  if (!info) { toast('No data found for employee', true); return; }
+
+  $('mdTitle').textContent = `${info.full_name} [${info.employee_id}]`;
+  $('mdBody').innerHTML = info.missing.length
+    ? `<div style="font-size:0.86rem;color:var(--gray-4);margin-bottom:10px">Missing ${info.missing.length} document type(s):</div>
+       <div class="chip-row">${info.missing.map(m => `<span class="chip">${m}</span>`).join('')}</div>`
+    : '<div class="empty"><div class="empty-icon"></div>All required document types are uploaded.</div>';
+  openModal('mMissingDocs');
+}
+
+async function loadEmpDocs() {
+  const id = $('docEmpSel').value;
+  const el = $('docTable');
+  if (!id) { el.innerHTML='<div class="empty"><div class="empty-icon"></div>Select an employee above</div>'; return; }
+  const docs = await json(`${API}/employees/${id}/documents`) || [];
+  if (!docs.length) {
+    el.innerHTML=`<div class="empty"><div class="empty-icon"></div>No documents on file yet.</div>`; return;
+  }
+  el.innerHTML = `
+    <table class="tbl">
+      <thead><tr><th>Type</th><th>Filename</th><th>Notes</th><th>Uploaded</th></tr></thead>
+      <tbody>${docs.map(d=>`
+        <tr>
+          <td><span class="badge b-gray">${d.doc_type}</span></td>
+          <td><a href="${docOpenUrl(d.id)}" target="_blank" rel="noopener noreferrer">${d.filename}</a></td>
+          <td style="color:var(--gray-4)">${d.notes||'—'}</td>
+          <td style="color:var(--gray-3);font-size:0.78rem">${d.uploaded_at.slice(0,10)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function uploadDoc() {
+  const empId = $('docEmpSel').value;
+  const docType = $('docTypeSel').value;
+  const file = $('docFile').files?.[0];
+  const notes = $('docNotes').value.trim();
+
+  if (!empId) { toast('Select an employee first', true); return; }
+  if (!docType) { toast('Select a document type', true); return; }
+  if (!file) { toast('Choose a file to upload', true); return; }
+
+  const form = new FormData();
+  form.append('doc_type', docType);
+  form.append('notes', notes);
+  form.append('file', file);
+
+  try {
+    const res = await fetch(`${API}/employees/${empId}/documents`, { method: 'POST', body: form });
+    const data = await res.json();
+    if (!res.ok || !data?.success) {
+      toast(data?.error || 'Upload failed', true);
+      return;
+    }
+
+    toast('Document uploaded');
+    $('docFile').value = '';
+    $('docNotes').value = '';
+    loadEmpDocs();
+    loadDashboard();
+    loadDocPage();
+    if (currentEmpId && String(currentEmpId) === String(empId)) openProfile(currentEmpId);
+  } catch {
+    toast('Upload failed', true);
+  }
+}
+
+// ── Letters ───────────────────────────────────────────────────
+async function loadLetterPage() {
+  const types = await json(`${API}/letter-types`) || [];
+  $('ltType').innerHTML = types.map(t=>`<option value="${t}">${t}</option>`).join('');
+}
+
+let acTimer;
+function acEmp() {
+  clearTimeout(acTimer);
+  acTimer = setTimeout(async () => {
+    const q = $('ltEmpQ').value.trim();
+    const el = $('ltEmpAc');
+    if (!q) { el.innerHTML=''; return; }
+    const data = await json(`${API}/employees?status=active&search=${encodeURIComponent(q)}`) || [];
+    if (!data.length) { el.innerHTML='<div style="padding:8px 14px;font-size:0.82rem;color:var(--gray-3)">No results</div>'; return; }
+    el.innerHTML = '<div class="ac-results">' + data.slice(0,5).map(e=>`
+      <div class="ac-item" onclick="pickEmp(${e.id},'${e.full_name.replace(/'/g,"\\'")}','${e.employee_id}')">
+        ${e.full_name}
+        <div class="ac-sub">${e.employee_id} · ${e.role||''}</div>
+      </div>`).join('') + '</div>';
+  }, 280);
+}
+
+function pickEmp(id, name, eid) {
+  ltEmpId = id;
+  $('ltEmpQ').value = `${name}  [${eid}]`;
+  $('ltEmpAc').innerHTML = '';
+}
+
+async function generateLetter() {
+  if (!ltEmpId) { toast('Select an employee first', true); return; }
+  const type = $('ltType').value;
+  const r = await json(`${API}/employees/${ltEmpId}/letters`, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({letter_type:type})
+  });
+  if (r?.success) {
+    toast(' Letter generated!');
+    $('ltOut').innerHTML = `
+      <div class="letter-saved"> Saved → <code>${r.file}</code></div>
+      <div class="letter-preview">${r.content}</div>`;
+  } else toast(r?.error||'Failed', true);
+}
+
+// ── Audit ─────────────────────────────────────────────────────
+async function loadAudit() {
+  const rows = await json(`${API}/audit`) || [];
+  const el = $('auditWrap');
+  if (!rows.length) { el.innerHTML='<div class="empty"><div class="empty-icon"></div>No entries yet</div>'; return; }
+
+  const actionCounts = rows.reduce((acc, r) => {
+    acc[r.action] = (acc[r.action] || 0) + 1;
+    return acc;
+  }, {});
+
+  const topActions = Object.entries(actionCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([name, count]) => `<span class="badge b-gray">${name.replace(/_/g,' ')}: ${count}</span>`)
+    .join('');
+
+  el.innerHTML = `
+    <div style="padding:12px 14px;border-bottom:1px solid var(--gray-2)">
+      <div class="audit-summary">${topActions}</div>
+    </div>
+    <table class="tbl audit-table">
+      <thead>
+        <tr><th>Time</th><th>Action</th><th>Entity</th><th>Details</th></tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr>
+            <td style="font-family:'Fira Code',monospace;font-size:0.76rem;color:var(--gray-3)">${r.timestamp.slice(0,16).replace('T',' ')}</td>
+            <td><span class="badge b-orange">${r.action.replace(/_/g,' ')}</span></td>
+            <td class="audit-entity">${r.entity || '—'}</td>
+            <td class="audit-detail-muted">${r.detail || '—'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ── Boot ──────────────────────────────────────────────────────
+loadTaskStorage();
+loadDashboard();
+</script>
+</body>
+</html>

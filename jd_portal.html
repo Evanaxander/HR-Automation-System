@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Forge JD Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-mark">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="var(--gold)"/>
+          <path d="M7 14h14M14 7v14" stroke="#0d1a27" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">HR Forge</span>
+        <span class="logo-sub">JD Portal</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M3 4.5h12M3 13.5h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-tab="compose">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M5 7h8M5 10h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Compose</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="settings">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M9 2v1.5M9 14.5V16M2 9h1.5M14.5 9H16M4.1 4.1l1.06 1.06M12.84 12.84l1.06 1.06M4.1 13.9l1.06-1.06M12.84 5.16l1.06-1.06" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Company Setup</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="leaves">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 8h14M6 2v4M12 2v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Leave Policy</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="holidays">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M9 5v4l2.5 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Holidays</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="preview">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1.5 9S4.5 3 9 3s7.5 6 7.5 6-3 6-7.5 6S1.5 9 1.5 9z" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="9" r="2" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Preview & Export</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="api-status" id="apiStatus">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Checking…</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title" id="pageTitle">Compose Job Posting</h1>
+        <p class="page-sub" id="pageSub">Select a role, configure details, and generate a platform-ready posting</p>
+      </div>
+      <div class="topbar-right">
+        <div class="ai-badge">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="var(--gold)" stroke-width="1.4"/><path d="M4.5 7l2 2 3-3" stroke="var(--gold)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          AI-Enhanced
+        </div>
+        <button class="btn-primary" id="generateBtn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Generate Posting
+        </button>
+      </div>
+    </header>
+
+    <section class="tab-panel active" id="tab-compose">
+      <div class="compose-grid">
+        <div class="compose-left">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-icon">🧩</span>
+              <h2>Role Setup</h2>
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label class="field-label" for="deptSelect">Department</label>
+                <div class="select-wrapper">
+                  <select id="deptSelect" class="form-select">
+                    <option value="">— Select Department —</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="roleSelect">Role</label>
+                <div class="select-wrapper">
+                  <select id="roleSelect" class="form-select" disabled>
+                    <option value="">— Select Role —</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 1rem;">
+              <div class="field-group">
+                <label class="field-label">Job Type</label>
+                <div class="toggle-group" id="jobTypeGroup">
+                  <button class="toggle-btn active" data-val="Full-Time">Full-Time</button>
+                  <button class="toggle-btn" data-val="Part-Time">Part-Time</button>
+                  <button class="toggle-btn" data-val="Contract">Contract</button>
+                  <button class="toggle-btn" data-val="Internship">Internship</button>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Workplace</label>
+                <div class="toggle-group" id="workplaceGroup">
+                  <button class="toggle-btn active" data-val="On-site">On-site</button>
+                  <button class="toggle-btn" data-val="Remote">Remote</button>
+                  <button class="toggle-btn" data-val="Hybrid">Hybrid</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top: 1rem; margin-bottom: 0;">
+              <div class="card-header">
+                <span class="card-icon">💰</span>
+                <h2>Salary</h2>
+              </div>
+
+              <div class="toggle-group" id="salaryModeGroup">
+                <button class="toggle-btn active" data-val="range">Range</button>
+                <button class="toggle-btn" data-val="negotiable">Negotiable</button>
+                <button class="toggle-btn" data-val="competitive">Competitive</button>
+                <button class="toggle-btn" data-val="skip">Skip</button>
+              </div>
+
+              <div id="salaryRangeFields" class="salary-range-fields">
+                <div class="form-row">
+                  <div class="field-group">
+                    <label class="field-label" for="salaryMin">Minimum</label>
+                    <div class="input-with-prefix">
+                      <span class="input-prefix" id="currencyPrefix">BDT</span>
+                      <input id="salaryMin" class="form-input" type="number" min="0" placeholder="50000" />
+                    </div>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="salaryMax">Maximum</label>
+                    <div class="input-with-prefix">
+                      <span class="input-prefix" id="currencyPrefix2">BDT</span>
+                      <input id="salaryMax" class="form-input" type="number" min="0" placeholder="80000" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="salaryAltMessage" class="salary-alt-msg" style="display:none"></div>
+
+              <div class="form-row" style="margin-top: 1rem;">
+                <div class="field-group">
+                  <label class="field-label" for="currencySelect">Currency</label>
+                  <div class="select-wrapper">
+                    <select id="currencySelect" class="form-select">
+                      <option value="BDT">BDT</option>
+                      <option value="USD">USD</option>
+                      <option value="EUR">EUR</option>
+                      <option value="GBP">GBP</option>
+                      <option value="INR">INR</option>
+                      <option value="SGD">SGD</option>
+                      <option value="AED">AED</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="payPeriod">Pay Period</label>
+                  <div class="select-wrapper">
+                    <select id="payPeriod" class="form-select">
+                      <option value="Monthly">Monthly</option>
+                      <option value="Annually">Annually</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 1rem;">
+              <div class="field-group">
+                <label class="field-label" for="expMin">Experience (Min years)</label>
+                <input id="expMin" class="form-input" type="number" min="0" placeholder="3" />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="expMax">Experience (Max years)</label>
+                <input id="expMax" class="form-input" type="number" min="0" placeholder="5" />
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 1rem;">
+              <div class="field-group">
+                <label class="field-label" for="educationSelect">Education</label>
+                <div class="select-wrapper">
+                  <select id="educationSelect" class="form-select">
+                    <option>Bachelor's degree</option>
+                    <option>Master's degree</option>
+                    <option>Diploma</option>
+                    <option>PhD</option>
+                    <option>Open</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="openPositions">Open Positions</label>
+                <input id="openPositions" class="form-input" type="number" min="1" value="1" />
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 1rem;">
+              <div class="field-group">
+                <label class="field-label">Output Format</label>
+                <div class="toggle-group" id="formatGroup">
+                  <button class="toggle-btn active" data-val="linkedin">LinkedIn</button>
+                  <button class="toggle-btn" data-val="facebook">Facebook</button>
+                  <button class="toggle-btn" data-val="jd">Full JD</button>
+                  <button class="toggle-btn" data-val="bdjobs">BDJobs</button>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">AI Tone</label>
+                <div class="toggle-group" id="toneGroup">
+                  <button class="toggle-btn active" data-val="professional">Professional</button>
+                  <button class="toggle-btn" data-val="enthusiastic">Enthusiastic</button>
+                  <button class="toggle-btn" data-val="concise">Concise</button>
+                  <button class="toggle-btn" data-val="technical">Technical</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card card-ai" style="margin-top: 1rem; margin-bottom: 0;">
+              <div class="card-header">
+                <span class="card-icon">✨</span>
+                <h2>AI Enhancement</h2>
+                <span class="badge-new">GPT-4o</span>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="openaiKey">OpenAI API Key (fallback)</label>
+                <div class="key-input-wrap">
+                  <input id="openaiKey" type="password" class="form-input" placeholder="sk-..." />
+                  <button id="keyToggle" class="key-toggle" type="button">👁</button>
+                </div>
+                <p class="field-hint">Backend mode is used first. This key is used only if backend AI is unavailable.</p>
+              </div>
+
+              <div class="field-group" style="margin-top: .75rem;">
+                <label class="field-label" for="additionalContext">Additional HR Context</label>
+                <textarea id="additionalContext" class="form-textarea" placeholder="Any project-specific requirements, tools, or notes"></textarea>
+              </div>
+
+              <button id="enhanceBtn" class="btn-ai" type="button">Enhance with AI</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-settings">
+      <div class="card settings-grid">
+        <div class="card-header">
+          <span class="card-icon">🏢</span>
+          <h2>Company Information</h2>
+        </div>
+
+        <div class="form-row">
+          <div class="field-group"><label class="field-label" for="companyName">Company Name</label><input id="companyName" class="form-input" placeholder="HR Forge" /></div>
+          <div class="field-group"><label class="field-label" for="companyWebsite">Website</label><input id="companyWebsite" class="form-input" placeholder="https://example.com" /></div>
+        </div>
+
+        <div class="form-row" style="margin-top: 1rem;">
+          <div class="field-group"><label class="field-label" for="companyCity">City</label><input id="companyCity" class="form-input" placeholder="Dhaka" /></div>
+          <div class="field-group"><label class="field-label" for="companyEmail">Careers Email</label><input id="companyEmail" class="form-input" type="email" placeholder="careers@example.com" /></div>
+        </div>
+
+        <div class="form-row" style="margin-top: 1rem;">
+          <div class="field-group"><label class="field-label" for="companyIndustry">Industry</label><input id="companyIndustry" class="form-input" placeholder="FinTech" /></div>
+          <div class="field-group">
+            <label class="field-label" for="companySize">Company Size</label>
+            <div class="select-wrapper">
+              <select id="companySize" class="form-select">
+                <option value="">Select</option>
+                <option>1-10</option>
+                <option>11-50</option>
+                <option>51-200</option>
+                <option>201-500</option>
+                <option>500+</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-top: 1rem;">
+          <label class="field-label" for="companyAbout">About Company</label>
+          <textarea id="companyAbout" class="form-textarea" placeholder="Brief company overview"></textarea>
+        </div>
+
+        <div class="field-group" style="margin-top: 1rem;">
+          <label class="field-label">Work Days Per Week</label>
+          <div class="toggle-group" id="workDaysGroup">
+            <button class="toggle-btn active" data-val="5">5 days</button>
+            <button class="toggle-btn" data-val="6">6 days</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card settings-grid">
+        <div class="card-header">
+          <span class="card-icon">🎁</span>
+          <h2>Benefits</h2>
+        </div>
+        <div class="checkbox-grid" id="benefitsGrid">
+          <label class="cb-item"><input type="checkbox" value="Health Insurance" checked /> Health Insurance</label>
+          <label class="cb-item"><input type="checkbox" value="Annual Bonus" checked /> Annual Bonus</label>
+          <label class="cb-item"><input type="checkbox" value="Performance Bonus" checked /> Performance Bonus</label>
+          <label class="cb-item"><input type="checkbox" value="Festival Bonus" checked /> Festival Bonus</label>
+          <label class="cb-item"><input type="checkbox" value="Office Meals/Snacks" checked /> Office Meals/Snacks</label>
+          <label class="cb-item"><input type="checkbox" value="Training Budget" checked /> Training Budget</label>
+          <label class="cb-item"><input type="checkbox" value="Yearly Increment" checked /> Yearly Increment</label>
+          <label class="cb-item"><input type="checkbox" value="Provident Fund" /> Provident Fund</label>
+          <label class="cb-item"><input type="checkbox" value="Gratuity" /> Gratuity</label>
+          <label class="cb-item"><input type="checkbox" value="Transport Allowance" /> Transport Allowance</label>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-leaves">
+      <div class="card settings-grid">
+        <div class="card-header">
+          <span class="card-icon">🧾</span>
+          <h2>Leave Policy</h2>
+        </div>
+
+        <div class="leave-grid">
+          <div class="leave-item"><span class="leave-icon">🟧</span><div class="leave-info"><span class="leave-name">Casual Leave</span><span class="leave-desc">Days/year</span></div><div class="leave-controls"><button class="qty-btn" data-target="casualLeave" data-action="dec">−</button><input id="casualLeave" class="qty-input" type="number" value="10" min="0" /><button class="qty-btn" data-target="casualLeave" data-action="inc">+</button><span class="leave-unit">days</span></div></div>
+          <div class="leave-item"><span class="leave-icon">🟧</span><div class="leave-info"><span class="leave-name">Sick Leave</span><span class="leave-desc">Days/year</span></div><div class="leave-controls"><button class="qty-btn" data-target="sickLeave" data-action="dec">−</button><input id="sickLeave" class="qty-input" type="number" value="14" min="0" /><button class="qty-btn" data-target="sickLeave" data-action="inc">+</button><span class="leave-unit">days</span></div></div>
+          <div class="leave-item"><span class="leave-icon">🟧</span><div class="leave-info"><span class="leave-name">Earned Leave</span><span class="leave-desc">Days/year</span></div><div class="leave-controls"><button class="qty-btn" data-target="earnedLeave" data-action="dec">−</button><input id="earnedLeave" class="qty-input" type="number" value="18" min="0" /><button class="qty-btn" data-target="earnedLeave" data-action="inc">+</button><span class="leave-unit">days</span></div></div>
+          <div class="leave-item"><span class="leave-icon">🟧</span><div class="leave-info"><span class="leave-name">Maternity Leave</span><span class="leave-desc">Days</span></div><div class="leave-controls"><button class="qty-btn" data-target="maternityLeave" data-action="dec">−</button><input id="maternityLeave" class="qty-input" type="number" value="112" min="0" /><button class="qty-btn" data-target="maternityLeave" data-action="inc">+</button><span class="leave-unit">days</span></div></div>
+          <div class="leave-item"><span class="leave-icon">🟧</span><div class="leave-info"><span class="leave-name">Paternity Leave</span><span class="leave-desc">Days</span></div><div class="leave-controls"><button class="qty-btn" data-target="paternityLeave" data-action="dec">−</button><input id="paternityLeave" class="qty-input" type="number" value="7" min="0" /><button class="qty-btn" data-target="paternityLeave" data-action="inc">+</button><span class="leave-unit">days</span></div></div>
+          <div class="leave-item"><span class="leave-icon">🟧</span><div class="leave-info"><span class="leave-name">Unpaid Leave</span><span class="leave-desc">Days/year</span></div><div class="leave-controls"><button class="qty-btn" data-target="unpaidLeave" data-action="dec">−</button><input id="unpaidLeave" class="qty-input" type="number" value="0" min="0" /><button class="qty-btn" data-target="unpaidLeave" data-action="inc">+</button><span class="leave-unit">days</span></div></div>
+          <div class="leave-item"><span class="leave-icon">🟧</span><div class="leave-info"><span class="leave-name">Religious Leave</span><span class="leave-desc">Days/year</span></div><div class="leave-controls"><button class="qty-btn" data-target="religiousLeave" data-action="dec">−</button><input id="religiousLeave" class="qty-input" type="number" value="3" min="0" /><button class="qty-btn" data-target="religiousLeave" data-action="inc">+</button><span class="leave-unit">days</span></div></div>
+          <div class="leave-item"><span class="leave-icon">🟧</span><div class="leave-info"><span class="leave-name">WFH Allowance</span><span class="leave-desc">Days/month</span></div><div class="leave-controls"><button class="qty-btn" data-target="wfhDays" data-action="dec">−</button><input id="wfhDays" class="qty-input" type="number" value="0" min="0" /><button class="qty-btn" data-target="wfhDays" data-action="inc">+</button><span class="leave-unit">days</span></div></div>
+        </div>
+
+        <div class="leave-summary">Total Annual Leave Days: <strong id="totalLeaveCount">45</strong></div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-holidays">
+      <div class="card settings-grid">
+        <div class="card-header">
+          <span class="card-icon">📅</span>
+          <h2>Weekly Off & Holidays</h2>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Weekly Off Days</label>
+          <div class="weekday-picker" id="weekdayPicker">
+            <button class="day-btn" data-day="Monday">Mon</button>
+            <button class="day-btn" data-day="Tuesday">Tue</button>
+            <button class="day-btn" data-day="Wednesday">Wed</button>
+            <button class="day-btn" data-day="Thursday">Thu</button>
+            <button class="day-btn" data-day="Friday">Fri</button>
+            <button class="day-btn" data-day="Saturday">Sat</button>
+            <button class="day-btn" data-day="Sunday">Sun</button>
+          </div>
+          <p class="field-hint" id="weekdayHint">Selected: none</p>
+        </div>
+
+        <div class="holiday-add-row" style="margin-top: 1rem;">
+          <input id="holidayName" class="form-input" placeholder="Holiday name" />
+          <input id="holidayDays" class="form-input" type="number" min="1" value="1" style="max-width:110px;" />
+          <button id="addHolidayBtn" class="btn-add" type="button">Add</button>
+        </div>
+
+        <div id="holidayList" class="holiday-list"></div>
+
+        <div class="holiday-presets">
+          <span class="presets-label">Quick Add:</span>
+          <button class="preset-btn" data-name="Eid ul-Fitr" data-days="3">Eid ul-Fitr</button>
+          <button class="preset-btn" data-name="Eid ul-Adha" data-days="3">Eid ul-Adha</button>
+          <button class="preset-btn" data-name="Pohela Boishakh" data-days="1">Pohela Boishakh</button>
+          <button class="preset-btn" data-name="Victory Day" data-days="1">Victory Day</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-preview">
+      <div class="preview-layout">
+        <div class="preview-toolbar">
+          <div class="toolbar-left">
+            <span class="preview-label">Output</span>
+            <div class="platform-tabs">
+              <button class="ptab active" data-platform="linkedin">LinkedIn</button>
+              <button class="ptab" data-platform="facebook">Facebook</button>
+              <button class="ptab" data-platform="jd">Full JD</button>
+              <button class="ptab" data-platform="bdjobs">BDJobs</button>
+            </div>
+          </div>
+          <div class="toolbar-right">
+            <button id="copyBtn" class="btn-tool" type="button">Copy</button>
+            <button id="downloadBtn" class="btn-tool" type="button">Download .txt</button>
+          </div>
+        </div>
+
+        <div class="preview-body">
+          <div id="previewEmpty" class="preview-empty">
+            <p><strong>No output yet</strong><br />Choose a department and role, then click Generate Posting.</p>
+          </div>
+          <textarea id="previewOutput" class="preview-textarea" style="display:none"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <div id="spinnerOverlay" class="spinner-overlay">
+      <div class="spinner-box">
+        <div class="spinner"></div>
+        <p id="spinnerMsg">Processing…</p>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+  </main>
+
+  <script src="/assets/app.js"></script>
+</body>
+</html>
