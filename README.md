@@ -1,3 +1,11 @@
+<img width="1444" height="778" alt="image" src="https://github.com/user-attachments/assets/d94e031e-152f-4dc9-b636-deaf659a9f43" />
+<img width="1881" height="890" alt="image" src="https://github.com/user-attachments/assets/f97299e9-9d26-4aa8-8e17-db10b5dd41f4" />
+<img width="1874" height="905" alt="image" src="https://github.com/user-attachments/assets/01762567-140f-4de4-bdb8-4af80e620aec" />
+
+
+
+
+
 # HR Forge
 
 AI-powered HR operations and hiring automation platform built with Python, Flask, SQLite, and a modern web interface.
