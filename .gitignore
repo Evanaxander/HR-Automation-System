@@ -1,29 +1,38 @@
-# Python cache and build artifacts
+# Python cache and test artifacts
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-*.so
-*.egg-info/
 .pytest_cache/
 .mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Build and packaging artifacts
+build/
+dist/
+*.egg-info/
 
 # Virtual environments
 .venv/
 venv/
 env/
+ENV/
 
 # Local secrets
 .env
+.env.*
 
 # Runtime output
 logs/
 
-# Local database and generated HR files
+# Local database and generated files
 data/*.db
 employee_docs/
 
-# OS/editor artifacts
+# Editor and OS artifacts
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
-.vscode/
