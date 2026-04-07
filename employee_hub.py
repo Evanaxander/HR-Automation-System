@@ -48,6 +48,7 @@ def init_db():
             phone         TEXT,
             whatsapp      TEXT,
             join_date     TEXT,
+            leader_id     INTEGER,
             status        TEXT DEFAULT 'active',
             created_at    TEXT DEFAULT (datetime('now'))
         );
@@ -94,6 +95,12 @@ def init_db():
             timestamp     TEXT DEFAULT (datetime('now'))
         );
     """)
+
+    c.execute("PRAGMA table_info(employees)")
+    cols = {row[1] for row in c.fetchall()}
+    if "leader_id" not in cols:
+        c.execute("ALTER TABLE employees ADD COLUMN leader_id INTEGER")
+
     conn.commit()
     conn.close()
 

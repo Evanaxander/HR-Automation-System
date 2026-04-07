@@ -23,9 +23,12 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 CORS(app)
 
+_SCHEMA_READY = False
+
 DB_PATH   = Path("data") / "employees.db"
 DOCS_ROOT = Path("employee_docs")
 BASE_DIR = Path(__file__).parent
+FRONTEND_DIST = BASE_DIR / "frontend" / "dist"
 POSTINGS_FILE = BASE_DIR / "postings.json"
 SETTINGS_FILE = BASE_DIR / "company_settings.json"
 
@@ -61,6 +64,10 @@ LETTER_TEMPLATES = {
 
 @app.route("/", methods=["GET"])
 def root():
+    frontend_index = FRONTEND_DIST / "index.html"
+    if frontend_index.exists():
+        return send_from_directory(FRONTEND_DIST, "index.html")
+
     landing_path = BASE_DIR / "landing.html"
     if landing_path.exists():
         return send_from_directory(landing_path.parent, landing_path.name)
@@ -78,20 +85,49 @@ def root():
 
 @app.route("/employee-hub", methods=["GET"])
 def employee_hub_ui():
+    frontend_index = FRONTEND_DIST / "index.html"
+    if frontend_index.exists():
+        return send_from_directory(FRONTEND_DIST, "index.html")
     return send_from_directory(BASE_DIR, "index.html")
 
 
 @app.route("/hiring-portal", methods=["GET"])
 def hiring_portal_ui():
+    frontend_index = FRONTEND_DIST / "index.html"
+    if frontend_index.exists():
+        return send_from_directory(FRONTEND_DIST, "index.html")
     return send_from_directory(BASE_DIR, "jd_portal.html")
 
 
 @app.route("/assets/<path:filename>", methods=["GET"])
 def public_assets(filename):
+    dist_assets = FRONTEND_DIST / "assets"
+    if dist_assets.exists():
+        candidate = dist_assets / Path(filename).name
+        if candidate.exists() and candidate.is_file():
+            return send_from_directory(dist_assets, candidate.name)
+
     safe_name = Path(filename).name
     if safe_name not in PUBLIC_FILES:
         return jsonify({"error": "File not found"}), 404
     return send_from_directory(BASE_DIR, safe_name)
+
+
+@app.route("/legacy/<path:filename>", methods=["GET"])
+def legacy_assets(filename):
+    legacy_dir = FRONTEND_DIST / "legacy"
+    if legacy_dir.exists():
+        candidate = legacy_dir / filename
+        if candidate.exists() and candidate.is_file():
+            return send_from_directory(legacy_dir, filename)
+
+    src_legacy = BASE_DIR / "frontend" / "public" / "legacy"
+    if src_legacy.exists():
+        candidate = src_legacy / filename
+        if candidate.exists() and candidate.is_file():
+            return send_from_directory(src_legacy, filename)
+
+    return jsonify({"error": "File not found"}), 404
 
 
 @app.route("/health", methods=["GET"])
@@ -106,6 +142,8 @@ def api_health():
     li_person = os.getenv("LINKEDIN_PERSON_URN", "")
     fb_token = os.getenv("FACEBOOK_ACCESS_TOKEN", "")
     fb_page = os.getenv("FACEBOOK_PAGE_ID", "")
+    betopia_url = os.getenv("BETOPIA_JOBS_URL", "https://betopiagroup.com/career")
+    job_portal_url = os.getenv("JOB_PORTAL_URL", "")
     return jsonify(
         {
             "status": "ok",
@@ -114,15 +152,58 @@ def api_health():
                 "openai": bool(openai_key),
                 "linkedin": bool(li_token and li_person),
                 "facebook": bool(fb_token and fb_page),
+                "betopia": bool(betopia_url),
+                "betopia_url": betopia_url,
+                "job_portal": bool(job_portal_url),
+                "job_portal_url": job_portal_url,
             },
         }
     )
 
 
 def get_conn():
+    global _SCHEMA_READY
+    if not _SCHEMA_READY:
+        ensure_schema()
+        _SCHEMA_READY = True
     conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def ensure_schema():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(DB_PATH))
+    cur = conn.cursor()
+
+    cur.execute("PRAGMA table_info(employees)")
+    cols = {row[1] for row in cur.fetchall()}
+    if "leader_id" not in cols:
+        cur.execute("ALTER TABLE employees ADD COLUMN leader_id INTEGER")
+
+    conn.commit()
+    conn.close()
+
+
+def normalize_leader_id(raw, emp_id=None):
+    if raw in (None, "", "null"):
+        return None
+
+    try:
+        leader_id = int(raw)
+    except (TypeError, ValueError):
+        raise ValueError("Invalid leader_id")
+
+    if emp_id is not None and leader_id == emp_id:
+        raise ValueError("Employee cannot be their own leader")
+
+    conn = get_conn()
+    exists = conn.execute("SELECT id FROM employees WHERE id=?", (leader_id,)).fetchone()
+    conn.close()
+    if not exists:
+        raise ValueError("Assigned leader not found")
+
+    return leader_id
 
 
 def audit(action, entity, detail):
@@ -159,14 +240,15 @@ def get_employees():
 def add_employee():
     d = request.json
     try:
+        leader_id = normalize_leader_id(d.get("leader_id"))
         conn = get_conn()
         conn.execute(
             """INSERT INTO employees
-               (full_name, employee_id, department, role, email, phone, whatsapp, join_date)
-               VALUES (?,?,?,?,?,?,?,?)""",
+               (full_name, employee_id, department, role, email, phone, whatsapp, join_date, leader_id)
+               VALUES (?,?,?,?,?,?,?,?,?)""",
             (d["full_name"], d["employee_id"], d.get("department",""),
              d.get("role",""), d.get("email",""), d.get("phone",""),
-             d.get("whatsapp",""), d.get("join_date", datetime.now().strftime("%Y-%m-%d"))),
+             d.get("whatsapp",""), d.get("join_date", datetime.now().strftime("%Y-%m-%d")), leader_id),
         )
         conn.commit()
         conn.close()
@@ -174,6 +256,8 @@ def add_employee():
         emp_folder.mkdir(parents=True, exist_ok=True)
         audit("ADD_EMPLOYEE", d["employee_id"], d["full_name"])
         return jsonify({"success": True})
+    except ValueError as e:
+        return jsonify({"success": False, "error": str(e)}), 400
     except sqlite3.IntegrityError:
         return jsonify({"success": False, "error": "Employee ID already exists"}), 400
 
@@ -211,8 +295,15 @@ def get_employee(emp_id):
 @app.route("/api/employees/<int:emp_id>", methods=["PUT"])
 def update_employee(emp_id):
     d = request.json
-    allowed = ["full_name","department","role","email","phone","whatsapp","status"]
+    allowed = ["full_name","department","role","email","phone","whatsapp","status", "leader_id"]
     updates = {k: v for k, v in d.items() if k in allowed}
+
+    if "leader_id" in updates:
+        try:
+            updates["leader_id"] = normalize_leader_id(updates.get("leader_id"), emp_id=emp_id)
+        except ValueError as e:
+            return jsonify({"success": False, "error": str(e)}), 400
+
     if not updates:
         return jsonify({"success": False, "error": "Nothing to update"}), 400
     set_clause = ", ".join(f"{k}=?" for k in updates)
@@ -526,6 +617,17 @@ def _upsert_posting(posting):
     _save_postings(items)
 
 
+def _ensure_social_status_shape(posting):
+    current = posting.get("social_status") or {}
+    posting["social_status"] = {
+        "linkedin": current.get("linkedin"),
+        "facebook": current.get("facebook"),
+        "betopia": current.get("betopia"),
+        "job_portal": current.get("job_portal"),
+    }
+    return posting
+
+
 def _salary_string(state):
     mode = state.get("salaryMode", "range")
     s_min = state.get("salaryMin", "")
@@ -673,7 +775,12 @@ def portal_save_posting():
         "company": body.get("company", {}),
         "state": body.get("state", {}),
         "outputs": body.get("outputs", {}),
-        "social_status": {"linkedin": None, "facebook": None},
+        "social_status": {
+            "linkedin": None,
+            "facebook": None,
+            "betopia": None,
+            "job_portal": None,
+        },
     }
     _upsert_posting(posting)
     return jsonify({"success": True, "id": posting["id"]}), 201
@@ -681,7 +788,8 @@ def portal_save_posting():
 
 @app.route("/api/postings", methods=["GET"])
 def portal_list_postings():
-    items = sorted(_load_postings(), key=lambda p: p["created_at"], reverse=True)
+    items = [_ensure_social_status_shape(p) for p in _load_postings()]
+    items = sorted(items, key=lambda p: p["created_at"], reverse=True)
     return jsonify({"success": True, "data": items, "count": len(items)})
 
 
@@ -858,6 +966,83 @@ def portal_post_facebook_job():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/post/betopia", methods=["POST"])
+def portal_post_betopia():
+    body = request.get_json(force=True) or {}
+    posting_id = body.get("posting_id")
+    text = body.get("text", "").strip()
+    if not text:
+        return jsonify({"error": "text is required"}), 400
+
+    target_url = os.getenv("BETOPIA_JOBS_URL", "https://betopiagroup.com/career").strip() or "https://betopiagroup.com/career"
+    auto_open = bool(body.get("open", True))
+
+    try:
+        if auto_open:
+            webbrowser.open(target_url)
+
+        if posting_id:
+            posting = _get_posting(posting_id)
+            if posting:
+                _ensure_social_status_shape(posting)
+                posting["social_status"]["betopia"] = {
+                    "url": target_url,
+                    "posted_at": datetime.now().isoformat(),
+                    "manual": True,
+                }
+                posting["updated_at"] = datetime.now().isoformat()
+                _upsert_posting(posting)
+
+        return jsonify({
+            "success": True,
+            "url": target_url,
+            "manual": True,
+            "message": "Betopia Jobs portal opened. Paste/submit the generated posting there.",
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/post/job-portal", methods=["POST"])
+def portal_post_job_portal():
+    body = request.get_json(force=True) or {}
+    posting_id = body.get("posting_id")
+    text = body.get("text", "").strip()
+    if not text:
+        return jsonify({"error": "text is required"}), 400
+
+    target_url = (body.get("url") or os.getenv("JOB_PORTAL_URL", "")).strip()
+    if not target_url:
+        return jsonify({"error": "Job portal URL missing. Provide url in request or set JOB_PORTAL_URL."}), 400
+
+    auto_open = bool(body.get("open", True))
+
+    try:
+        if auto_open:
+            webbrowser.open(target_url)
+
+        if posting_id:
+            posting = _get_posting(posting_id)
+            if posting:
+                _ensure_social_status_shape(posting)
+                posting["social_status"]["job_portal"] = {
+                    "url": target_url,
+                    "posted_at": datetime.now().isoformat(),
+                    "manual": True,
+                }
+                posting["updated_at"] = datetime.now().isoformat()
+                _upsert_posting(posting)
+
+        return jsonify({
+            "success": True,
+            "url": target_url,
+            "manual": True,
+            "message": "External job portal opened. Paste/submit the generated posting there.",
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/post/all", methods=["POST"])
 def portal_post_all():
     body = request.get_json(force=True) or {}
@@ -910,7 +1095,43 @@ def portal_post_all():
         except Exception as e:
             results["facebook"] = {"success": False, "error": str(e)}
 
+    betopia_url = os.getenv("BETOPIA_JOBS_URL", "https://betopiagroup.com/career").strip() or "https://betopiagroup.com/career"
+    results["betopia"] = {
+        "success": True,
+        "manual": True,
+        "url": betopia_url,
+        "message": "Manual submission required",
+    }
+
+    job_portal_url = (body.get("job_portal_url") or os.getenv("JOB_PORTAL_URL", "")).strip()
+    if job_portal_url:
+        results["job_portal"] = {
+            "success": True,
+            "manual": True,
+            "url": job_portal_url,
+            "message": "Manual submission required",
+        }
+    else:
+        results["job_portal"] = {
+            "success": False,
+            "manual": True,
+            "error": "JOB_PORTAL_URL not configured",
+        }
+
     return jsonify({"success": True, "results": results})
+
+
+@app.route("/<path:filename>", methods=["GET"])
+def frontend_static_files(filename):
+    frontend_file = FRONTEND_DIST / filename
+    if frontend_file.exists() and frontend_file.is_file():
+        return send_from_directory(FRONTEND_DIST, filename)
+
+    safe_name = Path(filename).name
+    if safe_name in PUBLIC_FILES and (BASE_DIR / safe_name).exists():
+        return send_from_directory(BASE_DIR, safe_name)
+
+    return jsonify({"error": "Not found"}), 404
 
 
 if __name__ == "__main__":

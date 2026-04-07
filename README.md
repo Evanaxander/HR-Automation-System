@@ -41,7 +41,7 @@ HR Forge combines two production-oriented modules in one system:
 ## Tech Stack
 
 - Backend: Python, Flask, Flask-CORS, SQLite
-- Frontend: HTML, CSS, JavaScript
+- Frontend: React (Vite), Tailwind CSS
 - AI: OpenAI Chat Completions API
 - Integrations: LinkedIn UGC API, Facebook Graph API
 - Runtime: Windows-friendly local environment with optional .env configuration
@@ -62,8 +62,14 @@ HR-Automation-System/
 ├── data/
 │   └── employees.db
 ├── employee_docs/
-└── logs/
+├── logs/
+└── frontend/
+	├── src/
+	├── public/legacy/
+	└── dist/ (generated build)
 ```
+
+Legacy static files remain in the root for compatibility, while production serving is now handled by the React app in `frontend/`.
 
 ## Quick Start
 
@@ -97,6 +103,10 @@ HUB_PORT=5051
 ### 4. Run the application
 
 ```powershell
+cd frontend
+npm install
+npm run build
+cd ..
 python server.py
 ```
 
@@ -105,6 +115,19 @@ Open:
 - `http://127.0.0.1:5051/` for the portal selector
 - `http://127.0.0.1:5051/employee-hub` for Workforce Hub
 - `http://127.0.0.1:5051/hiring-portal` for Hiring Portal
+
+### Frontend development mode (optional)
+
+```powershell
+# terminal 1
+python server.py
+
+# terminal 2
+cd frontend
+npm run dev
+```
+
+Vite proxies `/api/*` calls to `http://127.0.0.1:5051` during development.
 
 ## Optional Terminal Mode
 
@@ -153,4 +176,8 @@ Both web and terminal flows use the same SQLite database.
 
 ## License
 
-This project is provided for educational and portfolio use. Add a formal license if you plan to distribute commercially.
+This project is licensed under the MIT License.
+
+You are allowed to use, modify, distribute, and sell software based on this project, provided you keep the copyright and license notice.
+
+See [LICENSE](LICENSE) for full terms.
